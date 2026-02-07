@@ -1,0 +1,9 @@
+<div class="editar-insertar-pedido">
+  <h1>{{ vm.modoEdicion() ? 'Editar Pedido' : 'Nuevo Pedido' }}</h1>
+  
+  <app-pedido-form
+    [vm]="vm"
+    (guardar)="vm.guardarPedido()"
+    (cancelar)="vm.cancelar()">
+  </app-pedido-form>
+</div>
