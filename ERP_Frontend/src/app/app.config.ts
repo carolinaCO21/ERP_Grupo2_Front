@@ -12,9 +12,6 @@ import { getAuth, provideAuth } from '@angular/fire/auth';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 
-// Environment
-import { environment } from '../environments/environment';
-
 // Mock Repositories (para desarrollo)
 import { PedidoMockRepository } from '../data/repositories/pedido.repository.mock';
 import { ProveedorMockRepository } from '../data/repositories/proveedor.repository.mock';
