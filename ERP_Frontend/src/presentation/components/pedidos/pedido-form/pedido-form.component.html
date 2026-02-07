@@ -1,0 +1,124 @@
+<div class="pedido-form-container">
+  <!-- Estado de carga -->
+  <div class="loading-overlay" *ngIf="vm.isLoading()">
+    <div class="spinner"></div>
+    <p>Cargando...</p>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div class="error-alert" *ngIf="vm.errorMessage()">
+    <span class="error-icon">⚠️</span>
+    <p>{{ vm.errorMessage() }}</p>
+  </div>
+
+  <!-- Sección 1: Información General -->
+  <div class="form-section">
+    <h2 class="section-title">📋 Información General</h2>
+    
+    <div class="form-row">
+      <div class="form-group flex-2">
+        <label for="proveedor">Proveedor *</label>
+        <select
+          id="proveedor"
+          class="form-control"
+          [value]="vm.proveedorSeleccionado()"
+          (change)="onProveedorChange($event)"
+          [disabled]="vm.modoEdicion()">
+          <option value="">Seleccione un proveedor</option>
+          <option *ngFor="let proveedor of vm.proveedores()" [value]="proveedor.id">
+            {{ proveedor.nombreEmpresa }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group" *ngIf="vm.modoEdicion()">
+        <label for="estado">Estado *</label>
+        <select
+          id="estado"
+          class="form-control"
+          [value]="vm.estadoSeleccionado()"
+          (change)="onEstadoChange($event)">
+          <option *ngFor="let estado of getEstadosDisponibles()" [value]="estado">
+            {{ estado }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="direccion">Dirección de entrega *</label>
+      <input
+        id="direccion"
+        type="text"
+        class="form-control"
+        [value]="vm.direccionEntrega()"
+        (input)="onDireccionChange($event)"
+        placeholder="Calle, número, ciudad, código postal">
+    </div>
+  </div>
+
+  <!-- Sección 2: Líneas de Pedido -->
+  <div class="form-section">
+    <div class="section-header">
+      <h2 class="section-title">📦 Líneas de Pedido</h2>
+      <button
+        type="button"
+        class="btn btn-add"
+        (click)="vm.agregarLinea()"
+        [disabled]="!vm.proveedorSeleccionado()">
+        <span>➕</span> Agregar línea
+      </button>
+    </div>
+
+    <div class="lineas-container" *ngIf="vm.lineasPedido().length > 0">
+      <app-linea-pedido-item
+        *ngFor="let linea of vm.lineasPedido(); let i = index"
+        [linea]="linea"
+        [index]="i"
+        [productos]="vm.productosDisponibles()"
+        (lineaChange)="vm.onLineaChange(i, $event)"
+        (eliminar)="vm.eliminarLinea(i)">
+      </app-linea-pedido-item>
+    </div>
+
+    <div class="empty-lineas" *ngIf="vm.lineasPedido().length === 0">
+      <div class="empty-icon">📦</div>
+      <p>No hay líneas de pedido. Agrega productos para continuar.</p>
+    </div>
+  </div>
+
+  <!-- Sección 3: Totales -->
+  <div class="form-section totales-section">
+    <div class="totales-card">
+      <div class="total-row">
+        <span class="total-label">Subtotal:</span>
+        <span class="total-value">{{ vm.subtotalPedido() | currency: 'EUR' }}</span>
+      </div>
+      <div class="total-row">
+        <span class="total-label">IVA:</span>
+        <span class="total-value">{{ vm.impuestosPedido() | currency: 'EUR' }}</span>
+      </div>
+      <div class="total-row total-final">
+        <span class="total-label">Total:</span>
+        <span class="total-value">{{ vm.totalPedido() | currency: 'EUR' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botones de acción -->
+  <div class="form-actions">
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="onCancelar()">
+      Cancelar
+    </button>
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="onGuardar()"
+      [disabled]="!puedeGuardar()">
+      {{ vm.modoEdicion() ? 'Actualizar' : 'Crear' }} Pedido
+    </button>
+  </div>
+</div>

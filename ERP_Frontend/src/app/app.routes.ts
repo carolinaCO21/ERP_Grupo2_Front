@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from '../presentation/views/auth/login/login.component';
 import { HomeComponent } from '../presentation/views/main/home/home.component';
 import { ListadoPedidosComponent } from '../presentation/views/pedidos/listado-pedidos/listado-pedidos.component';
+import { DetallePedidoComponent } from '../presentation/views/pedidos/detalle-pedido/detalle-pedido.component';
 import { EditarInsertarPedidoComponent } from '../presentation/views/pedidos/editar-insertar-pedido/editar-insertar-pedido.component';
 import { EnConstruccionComponent } from '../presentation/views/shared/en-construccion/en-construccion.component';
 import { authGuard } from '../core/guards/auth.guard';
@@ -42,15 +43,15 @@ export const routes: Routes = [
     canActivate: [authGuard],
     title: 'Nuevo Pedido - AndalucíaERP'
   },
-  { 
-    path: 'pedidos/editar/:id', 
+  {
+    path: 'pedidos/editar/:id',
     component: EditarInsertarPedidoComponent,
     canActivate: [authGuard],
     title: 'Editar Pedido - AndalucíaERP'
   },
-  { 
-    path: 'pedidos/:id', 
-    component: EditarInsertarPedidoComponent,
+  {
+    path: 'pedidos/detalle/:id',
+    component: DetallePedidoComponent,
     canActivate: [authGuard],
     title: 'Detalle de Pedido - AndalucíaERP'
   },

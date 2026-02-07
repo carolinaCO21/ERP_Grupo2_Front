@@ -1,0 +1,82 @@
+<div class="linea-pedido-item">
+  <div class="linea-numero">
+    <span class="numero-badge">{{ index + 1 }}</span>
+  </div>
+
+  <div class="linea-content">
+    <div class="form-row">
+      <!-- Producto -->
+      <div class="form-group flex-2">
+        <label [attr.for]="'producto-' + index">Producto *</label>
+        <select
+          [id]="'producto-' + index"
+          class="form-control"
+          [value]="linea.idProducto"
+          (change)="onProductoChange($event)">
+          <option value="0">Seleccione un producto</option>
+          <option *ngFor="let producto of productos" [value]="producto.idProducto">
+            {{ producto.codigoProducto }} - {{ producto.nombreProducto }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Cantidad -->
+      <div class="form-group">
+        <label [attr.for]="'cantidad-' + index">Cantidad *</label>
+        <input
+          [id]="'cantidad-' + index"
+          type="number"
+          class="form-control"
+          min="1"
+          [value]="linea.cantidad"
+          (input)="onCantidadChange($event)">
+      </div>
+
+      <!-- Precio Unitario -->
+      <div class="form-group">
+        <label [attr.for]="'precio-' + index">Precio Unit. (€) *</label>
+        <input
+          [id]="'precio-' + index"
+          type="number"
+          class="form-control"
+          min="0"
+          step="0.01"
+          [value]="linea.precioUnitario"
+          (input)="onPrecioChange($event)">
+      </div>
+
+      <!-- IVA % -->
+      <div class="form-group">
+        <label [attr.for]="'iva-' + index">IVA % *</label>
+        <select
+          [id]="'iva-' + index"
+          class="form-control"
+          [value]="linea.ivaPorcentaje"
+          (change)="onIvaChange($event)">
+          <option value="0">0%</option>
+          <option value="4">4%</option>
+          <option value="10">10%</option>
+          <option value="21">21%</option>
+        </select>
+      </div>
+
+      <!-- Total de la línea -->
+      <div class="form-group">
+        <label>Total</label>
+        <div class="total-display">
+          {{ calcularTotal() | currency: 'EUR' }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="linea-actions">
+    <button
+      type="button"
+      class="btn-delete"
+      (click)="onEliminar()"
+      title="Eliminar línea">
+      🗑️
+    </button>
+  </div>
+</div>

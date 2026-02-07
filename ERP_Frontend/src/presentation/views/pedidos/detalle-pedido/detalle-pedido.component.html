@@ -1,0 +1,127 @@
+<div class="app-layout">
+  <app-header></app-header>
+  
+  <div class="main-content">
+    <app-sidebar></app-sidebar>
+    
+    <main class="content-area">
+      <!-- Loading -->
+      <div class="loading-container" *ngIf="vm.isLoading()">
+        <div class="spinner-large"></div>
+        <p>Cargando pedido...</p>
+      </div>
+
+      <!-- Error -->
+      <div class="error-container" *ngIf="vm.errorMessage() && !vm.isLoading()">
+        <span class="error-icon">⚠️</span>
+        <p>{{ vm.errorMessage() }}</p>
+        <button class="btn btn-secondary" (click)="vm.volver()">
+          Volver al listado
+        </button>
+      </div>
+
+      <!-- Detalle del Pedido -->
+      <div class="detalle-pedido" *ngIf="vm.pedido() && !vm.isLoading()">
+        <!-- Cabecera -->
+        <div class="page-header">
+          <div class="header-left">
+            <h1 class="page-title">
+              <span class="title-icon">📋</span>
+              Detalle del Pedido
+            </h1>
+            <p class="pedido-numero">{{ vm.pedido()?.numeroPedido }}</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-secondary" (click)="vm.volver()">
+              ← Volver
+            </button>
+            <button class="btn btn-primary" (click)="vm.editarPedido()">
+              ✏️ Editar
+            </button>
+          </div>
+        </div>
+
+        <!-- Estado del pedido -->
+        <div class="estado-card">
+          <span class="estado-badge" [ngClass]="vm.estadoBadgeClass()">
+            {{ vm.pedido()?.estado }}
+          </span>
+        </div>
+
+        <!-- Información general -->
+        <div class="info-section">
+          <h2 class="section-title">📦 Información General</h2>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Proveedor:</span>
+              <span class="info-value">{{ vm.pedido()?.nombreProveedor }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Usuario:</span>
+              <span class="info-value">{{ vm.pedido()?.nombreUsuario }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Fecha del pedido:</span>
+              <span class="info-value">{{ vm.pedido()?.fechaPedido | date: 'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="info-item full-width">
+              <span class="info-label">Dirección de entrega:</span>
+              <span class="info-value">{{ vm.pedido()?.direccionEntrega }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Líneas del pedido -->
+        <div class="lineas-section">
+          <h2 class="section-title">📦 Líneas del Pedido ({{ vm.totalLineas() }})</h2>
+          <div class="table-container">
+            <table class="lineas-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Código</th>
+                  <th>Producto</th>
+                  <th class="text-right">Cantidad</th>
+                  <th class="text-right">Precio Unit.</th>
+                  <th class="text-right">Subtotal</th>
+                  <th class="text-right">IVA (%)</th>
+                  <th class="text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let linea of vm.pedido()?.lineasPedido; let i = index">
+                  <td class="linea-numero">{{ i + 1 }}</td>
+                  <td>{{ linea.codigoProducto }}</td>
+                  <td class="producto-nombre">{{ linea.nombreProducto }}</td>
+                  <td class="text-right">{{ linea.cantidad }}</td>
+                  <td class="text-right">{{ linea.precioUnitario | currency: 'EUR' }}</td>
+                  <td class="text-right">{{ linea.subtotal | currency: 'EUR' }}</td>
+                  <td class="text-right">{{ linea.ivaPorcentaje }}%</td>
+                  <td class="text-right total-linea">{{ linea.totalLinea | currency: 'EUR' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Totales -->
+        <div class="totales-section">
+          <div class="totales-card">
+            <div class="total-row">
+              <span class="total-label">Subtotal:</span>
+              <span class="total-value">{{ vm.pedido()?.subtotal | currency: 'EUR' }}</span>
+            </div>
+            <div class="total-row">
+              <span class="total-label">IVA:</span>
+              <span class="total-value">{{ vm.pedido()?.impuestos | currency: 'EUR' }}</span>
+            </div>
+            <div class="total-row total-final">
+              <span class="total-label">Total:</span>
+              <span class="total-value">{{ vm.pedido()?.total | currency: 'EUR' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
