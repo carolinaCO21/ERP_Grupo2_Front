@@ -12,6 +12,15 @@ import { getAuth, provideAuth } from '@angular/fire/auth';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 
+// Environment
+import { environment } from '../environments/environment';
+
+// Mock Repositories (para desarrollo)
+import { PedidoMockRepository } from '../data/repositories/pedido.repository.mock';
+import { ProveedorMockRepository } from '../data/repositories/proveedor.repository.mock';
+import { ProductoMockRepository } from '../data/repositories/producto.repository.mock';
+import { UsuarioMockRepository } from '../data/repositories/usuario.repository.mock';
+
 // Configuración de Firebase
 // IMPORTANTE: Reemplaza estos valores con los de tu proyecto Firebase
 const firebaseConfig = {
@@ -40,7 +49,21 @@ export const appConfig: ApplicationConfig = {
     provideFirebaseApp(() => initializeApp(firebaseConfig)),
     provideAuth(() => getAuth()),
 
-    // Aquí puedes agregar más providers según necesites
-    // Por ejemplo: services globales, configuraciones, etc.
+    // Mock Repositories (si está habilitado en environment)
+    ...(environment.useMocks ? [
+      { provide: 'RepositoriosMocking', useValue: true },
+      PedidoMockRepository,
+      ProveedorMockRepository,
+      ProductoMockRepository,
+      UsuarioMockRepository
+    ] : []),
+
+    // Log de estado de mocks
+    ...(() => {
+      if (environment.useMocks) {
+        console.log('%c🔧 USANDO REPOSITORIOS MOCK', 'color: #ff6b6b; font-weight: bold; font-size: 14px');
+      }
+      return [];
+    })()
   ]
 };
