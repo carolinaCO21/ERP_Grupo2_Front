@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
-import { HeaderComponent } from '../../components/header/header.component';
-import { SidebarComponent } from '../../components/sidebar/sidebar.component';
+import { HeaderComponent } from '../../components/shared/header/header.component';
+import { SidebarComponent } from '../../components/shared/sidebar/sidebar.component';
 import { DetallePedidoViewModel } from '../../viewmodels/detalle-pedido.videmodel';
 
 @Component({

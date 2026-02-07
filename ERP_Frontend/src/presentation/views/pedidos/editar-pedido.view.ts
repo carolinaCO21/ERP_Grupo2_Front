@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { HeaderComponent } from '../../components/header/header.component';
-import { SidebarComponent } from '../../components/sidebar/sidebar.component';
-import { EditarPedidoViewModel } from '../../viewmodels/editar-pedido.viewmodel';
+import { HeaderComponent } from '../../components/shared/header/header.component';
+import { SidebarComponent } from '../../components/shared/sidebar/sidebar.component';
+import { EditarPedidoViewModel } from '../../viewmodels/editar-insertar-pedido.viewmodel';
 
 @Component({
   selector: 'app-editar-pedido-view',
