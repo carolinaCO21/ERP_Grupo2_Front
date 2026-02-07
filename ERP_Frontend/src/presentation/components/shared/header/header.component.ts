@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { LogoutUseCase } from '../../../application/usecases/auth/logout.usecase';
+import { LogoutUseCase } from '../../../../domain/usecases/auth/logout.usecase';
 
 @Component({
   selector: 'app-header',

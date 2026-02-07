@@ -1,10 +1,10 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { GetPedidosUseCase } from '../../../application/usecases/pedidos/get-pedidos.usecase';
-import { GetPedidosByProveedorUseCase } from '../../../application/usecases/pedidos/get-pedidos-by-proveedor.usecase';
-import { GetPedidosByEstadoUseCase } from '../../../application/usecases/pedidos/get-pedidos-by-estado.usecase';
-import { DeletePedidoUseCase } from '../../../application/usecases/pedidos/delete-pedido.usecase';
-import { GetProveedoresUseCase } from '../../../application/usecases/proveedores/get-proveedores.usecase';
+import { GetPedidosUseCase } from '../../../domain/usecases/pedidos/get-pedidos.usecase';
+import { GetPedidosByProveedorUseCase } from '../../../domain/usecases/pedidos/get-pedidos-by-proveedor.usecase';
+import { GetPedidosByEstadoUseCase } from '../../../domain/usecases/pedidos/get-pedidos-by-estado.usecase';
+import { DeletePedidoUseCase } from '../../../domain/usecases/pedidos/delete-pedido.usecase';
+import { GetProveedoresUseCase } from '../../../domain/usecases/proveedores/get-proveedores.usecase';
 import { PedidoUIModel } from '../../models/pedido-ui.model';
 import { ProveedorDTO } from '../../../domain/dtos/proveedor.dto';
 import { EstadoPedido } from '../../../domain/enums/estado-pedido.enum';

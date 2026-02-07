@@ -1,10 +1,9 @@
 import { Routes } from '@angular/router';
-import { LoginView } from '../presentation/views/login/login.view';
-import { HomeView } from '../presentation/views/main/home/home.component';
-import { ListadoPedidosView } from '../presentation/views/pedidos/listado-pedidos/listado-pedidos.component';
-import { DetallePedidoView } from '../presentation/views/pedidos/detalle-pedido.view';
-import { EditarPedidoView } from '../presentation/views/pedidos/editar-insertar-pedido/editar-pedido.view';
-import { EnConstruccionView } from '../presentation/views/en-construccion/en-construccion.view';
+import { LoginComponent } from '../presentation/views/auth/login/login.component';
+import { HomeComponent } from '../presentation/views/main/home/home.component';
+import { ListadoPedidosComponent } from '../presentation/views/pedidos/listado-pedidos/listado-pedidos.component';
+import { EditarInsertarPedidoComponent } from '../presentation/views/pedidos/editar-insertar-pedido/editar-insertar-pedido.component';
+import { EnConstruccionComponent } from '../presentation/views/shared/en-construccion/en-construccion.component';
 import { authGuard } from '../core/guards/auth.guard';
 
 export const routes: Routes = [
@@ -18,14 +17,14 @@ export const routes: Routes = [
   // Login - Sin protección
   { 
     path: 'login', 
-    component: LoginView,
+    component: LoginComponent,
     title: 'Iniciar Sesión - AndalucíaERP'
   },
 
   // Home - Protegido
   { 
     path: 'home', 
-    component: HomeView,
+    component: HomeComponent,
     canActivate: [authGuard],
     title: 'Inicio - AndalucíaERP'
   },
@@ -33,25 +32,25 @@ export const routes: Routes = [
   // Pedidos - Rutas protegidas
   { 
     path: 'pedidos', 
-    component: ListadoPedidosView,
+    component: ListadoPedidosComponent,
     canActivate: [authGuard],
     title: 'Pedidos a Proveedores - AndalucíaERP'
   },
   { 
     path: 'pedidos/nuevo', 
-    component: EditarPedidoView,
+    component: EditarInsertarPedidoComponent,
     canActivate: [authGuard],
     title: 'Nuevo Pedido - AndalucíaERP'
   },
   { 
     path: 'pedidos/editar/:id', 
-    component: EditarPedidoView,
+    component: EditarInsertarPedidoComponent,
     canActivate: [authGuard],
     title: 'Editar Pedido - AndalucíaERP'
   },
   { 
     path: 'pedidos/:id', 
-    component: DetallePedidoView,
+    component: EditarInsertarPedidoComponent,
     canActivate: [authGuard],
     title: 'Detalle de Pedido - AndalucíaERP'
   },
@@ -59,7 +58,7 @@ export const routes: Routes = [
   // En Construcción - Para módulos no desarrollados
   { 
     path: 'en-construccion', 
-    component: EnConstruccionView,
+    component: EnConstruccionComponent,
     canActivate: [authGuard],
     title: 'En Construcción - AndalucíaERP'
   },

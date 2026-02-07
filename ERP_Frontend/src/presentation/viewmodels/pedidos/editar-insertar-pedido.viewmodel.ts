@@ -1,16 +1,16 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { CreatePedidoUseCase } from '../../../application/usecases/pedidos/create-pedido.usecase';
-import { UpdatePedidoUseCase } from '../../../application/usecases/pedidos/update-pedido.usecase';
-import { GetPedidoByIdUseCase } from '../../../application/usecases/pedidos/get-pedido-by-id.usecase';
-import { GetProveedoresUseCase } from '../../../application/usecases/proveedores/get-proveedores.usecase';
-import { GetProductosPorProveedorUseCase } from '../../../application/usecases/proveedores/get-productos-por-proveedor.usecase';
+import { CreatePedidoUseCase } from '../../../domain/usecases/pedidos/create-pedido.usecase';
+import { UpdatePedidoUseCase } from '../../../domain/usecases/pedidos/update-pedido.usecase';
+import { GetPedidoByIdUseCase } from '../../../domain/usecases/pedidos/get-pedido-by-id.usecase';
+import { GetProveedoresUseCase } from '../../../domain/usecases/proveedores/get-proveedores.usecase';
+import { GetProductosPorProveedorUseCase } from '../../../domain/usecases/proveedores/get-productos-por-proveedor.usecase';
 import { ProveedorDTO } from '../../../domain/dtos/proveedor.dto';
 import { ProductoProveedorDTO } from '../../../domain/dtos/producto-proveedor.dto';
 import { LineaPedidoCreateDTO } from '../../../domain/dtos/linea-pedido-create.dto';
 import { PedidoCreateDTO } from '../../../domain/dtos/pedido-create.dto';
 import { PedidoUpdateDTO } from '../../../domain/dtos/pedido-update.dto';
-import { UsuarioRepository } from '../../../data/repositories/usuario.repository';
+import { UsuarioMockRepository } from '../../../data/repositories/usuario.repository.mock';
 import { EstadoPedido } from '../../../domain/enums/estado-pedido.enum';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class EditarInsertarPedidoViewModel {
   private getPedidoByIdUseCase = inject(GetPedidoByIdUseCase);
   private getProveedoresUseCase = inject(GetProveedoresUseCase);
   private getProductosPorProveedorUseCase = inject(GetProductosPorProveedorUseCase);
-  private usuarioRepository = inject(UsuarioRepository);
+  private usuarioRepository = inject(UsuarioMockRepository);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   

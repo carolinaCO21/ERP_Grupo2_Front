@@ -28,7 +28,7 @@
             type="text"
             class="search-input"
             placeholder="Buscar por número de pedido o proveedor..."
-            [value]="viewModel.filtroBusqueda"
+            [value]="filtroBusqueda"
             (input)="onBuscar($event)"
           />
         </div>
@@ -36,23 +36,23 @@
         <div class="filter-chips">
           <button
             class="filter-chip"
-            [class.active]="viewModel.filtroEstado === ''"
+            [class.active]="filtroEstado === ''"
             (click)="onFiltrarEstado('')">
             Todos
-            <span class="chip-count">{{ viewModel.pedidos.length }}</span>
+            <span class="chip-count">{{ pedidos.length }}</span>
           </button>
 
           <button
-            *ngFor="let estado of viewModel.obtenerEstadosDisponibles()"
+            *ngFor="let estado of obtenerEstadosDisponibles()"
             class="filter-chip"
-            [class.active]="viewModel.filtroEstado === estado"
+            [class.active]="filtroEstado === estado"
             (click)="onFiltrarEstado(estado)">
             {{ estado.replace('_', ' ') }}
-            <span class="chip-count">{{ viewModel.obtenerCantidadPorEstado(estado) }}</span>
+            <span class="chip-count">{{ obtenerCantidadPorEstado(estado) }}</span>
           </button>
 
           <button
-            *ngIf="viewModel.filtroEstado || viewModel.filtroBusqueda"
+            *ngIf="filtroEstado || filtroBusqueda"
             class="btn-clear-filters"
             (click)="onLimpiarFiltros()">
             <span>✖</span> Limpiar filtros
@@ -61,60 +61,60 @@
       </div>
 
       <!-- Resumen -->
-      <div class="summary-section" *ngIf="viewModel.pedidosFiltrados.length > 0">
+      <div class="summary-section" *ngIf="pedidosFiltrados.length > 0">
         <div class="summary-card">
           <span class="summary-label">Total de pedidos:</span>
-          <span class="summary-value">{{ viewModel.pedidosFiltrados.length }}</span>
+          <span class="summary-value">{{ pedidosFiltrados.length }}</span>
         </div>
         <div class="summary-card">
           <span class="summary-label">Valor total:</span>
-          <span class="summary-value total">{{ viewModel.calcularTotalGeneral() | currency: 'EUR' }}</span>
+          <span class="summary-value total">{{ calcularTotalGeneral() | currency: 'EUR' }}</span>
         </div>
       </div>
 
       <!-- Loading -->
-      <div class="loading-container" *ngIf="viewModel.cargando">
+      <div class="loading-container" *ngIf="cargando">
         <div class="spinner-large"></div>
         <p>Cargando pedidos...</p>
       </div>
 
       <!-- Error -->
-      <div class="error-container" *ngIf="viewModel.error && !viewModel.cargando">
+      <div class="error-container" *ngIf="error && !cargando">
         <span class="error-icon">⚠️</span>
-        <p>{{ viewModel.error }}</p>
+        <p>{{ error }}</p>
         <button class="btn btn-secondary" (click)="ngOnInit()">
           Reintentar
         </button>
       </div>
 
       <!-- Sin resultados -->
-      <div class="empty-state" *ngIf="!viewModel.cargando && !viewModel.error && viewModel.pedidosFiltrados.length === 0">
+      <div class="empty-state" *ngIf="!cargando && !error && pedidosFiltrados.length === 0">
         <div class="empty-icon">📭</div>
         <h3>No se encontraron pedidos</h3>
-        <p *ngIf="viewModel.filtroEstado || viewModel.filtroBusqueda">
+        <p *ngIf="filtroEstado || filtroBusqueda">
           Intenta ajustar los filtros de búsqueda
         </p>
-        <p *ngIf="!viewModel.filtroEstado && !viewModel.filtroBusqueda">
+        <p *ngIf="!filtroEstado && !filtroBusqueda">
           Comienza creando tu primer pedido
         </p>
-        <button 
-          *ngIf="viewModel.filtroEstado || viewModel.filtroBusqueda"
-          class="btn btn-secondary" 
+        <button
+          *ngIf="filtroEstado || filtroBusqueda"
+          class="btn btn-secondary"
           (click)="onLimpiarFiltros()">
           Limpiar filtros
         </button>
-        <button 
-          *ngIf="!viewModel.filtroEstado && !viewModel.filtroBusqueda"
-          [routerLink]="['/pedidos/nuevo']" 
+        <button
+          *ngIf="!filtroEstado && !filtroBusqueda"
+          [routerLink]="['/pedidos/nuevo']"
           class="btn btn-primary">
           Crear primer pedido
         </button>
       </div>
 
       <!-- Listado de pedidos -->
-      <div class="pedidos-grid" *ngIf="!viewModel.cargando && !viewModel.error && viewModel.pedidosFiltrados.length > 0">
+      <div class="pedidos-grid" *ngIf="!cargando && !error && pedidosFiltrados.length > 0">
         <app-pedido-card
-          *ngFor="let pedido of viewModel.pedidosFiltrados"
+          *ngFor="let pedido of pedidosFiltrados"
           [pedido]="pedido"
           (eliminar)="onEliminarPedido($event)">
         </app-pedido-card>

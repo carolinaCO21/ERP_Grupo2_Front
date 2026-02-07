@@ -8,10 +8,10 @@ import { SidebarComponent } from '../../../components/shared/sidebar/sidebar.com
   selector: 'app-home-view',
   standalone: true,
   imports: [CommonModule, RouterModule, HeaderComponent, SidebarComponent],
-  templateUrl: './home.view.html',
-  styleUrls: ['./home.view.css']
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css']
 })
-export class HomeView {
+export class HomeComponent {
   nombreUsuario: string = '';
 
   constructor() {
