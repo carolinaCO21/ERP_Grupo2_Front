@@ -1,90 +1,23 @@
 <div class="login-container">
-  <div class="login-card">
-    <div class="login-header">
-      <div class="logo">
-        <span class="logo-icon">🏢</span>
-      </div>
-      <h1 class="login-title">AndalucíaERP</h1>
-      <p class="login-subtitle">Sistema de Gestión Empresarial</p>
+  <form (ngSubmit)="onSubmit()">
+    <h1>Login</h1>
+    
+    <div class="form-group">
+      <label>Email:</label>
+      <input type="email" [(ngModel)]="email" name="email" required />
     </div>
-
-    <form class="login-form" (ngSubmit)="onSubmit($event)">
-      <div class="form-group">
-        <label for="email" class="form-label">
-          <span class="label-icon">📧</span>
-          Correo Electrónico
-        </label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          class="form-input"
-          [value]="vm.email()"
-          (input)="onEmailChange($any($event.target).value); onInputChange()"
-          placeholder="usuario@ejemplo.com"
-          [disabled]="vm.isLoading()"
-          required
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="password" class="form-label">
-          <span class="label-icon">🔒</span>
-          Contraseña
-        </label>
-        <div class="password-input-wrapper">
-          <input
-            [type]="mostrarPassword ? 'text' : 'password'"
-            id="password"
-            name="password"
-            class="form-input"
-            [value]="vm.password()"
-            (input)="onPasswordChange($any($event.target).value); onInputChange()"
-            placeholder="••••••••"
-            [disabled]="vm.isLoading()"
-            required
-          />
-          <button
-            type="button"
-            class="toggle-password"
-            (click)="togglePasswordVisibility()"
-            [disabled]="vm.isLoading()"
-          >
-            <span *ngIf="!mostrarPassword">👁️</span>
-            <span *ngIf="mostrarPassword">🙈</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="error-message" *ngIf="vm.errorMessage()">
-        <span class="error-icon">⚠️</span>
-        {{ vm.errorMessage() }}
-      </div>
-
-      <button
-        type="submit"
-        class="btn-login"
-        [disabled]="vm.isLoading()"
-      >
-        <span *ngIf="!vm.isLoading()">Iniciar Sesión</span>
-        <span *ngIf="vm.isLoading()" class="loading">
-          <span class="spinner"></span>
-          Iniciando sesión...
-        </span>
-      </button>
-    </form>
-
-    <div class="login-footer">
-      <p class="info-text">
-        <span class="info-icon">ℹ️</span>
-        Acceso exclusivo para personal autorizado de la Junta de Andalucía
-      </p>
+    
+    <div class="form-group">
+      <label>Password:</label>
+      <input type="password" [(ngModel)]="password" name="password" required />
     </div>
-  </div>
-
-  <div class="background-decoration">
-    <div class="circle circle-1"></div>
-    <div class="circle circle-2"></div>
-    <div class="circle circle-3"></div>
-  </div>
+    
+    <div *ngIf="vm.errorMessage()" class="error">
+      {{ vm.errorMessage() }}
+    </div>
+    
+    <button type="submit" [disabled]="vm.isLoading()">
+      {{ vm.isLoading() ? 'Cargando...' : 'Iniciar Sesión' }}
+    </button>
+  </form>
 </div>

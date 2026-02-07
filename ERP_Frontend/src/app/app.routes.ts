@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
 import { LoginView } from '../presentation/views/login/login.view';
-import { HomeView } from '../presentation/views/main/home/home.view';
-import { ListadoPedidosView } from '../presentation/views/pedidos/listado-pedidos.view';
+import { HomeView } from '../presentation/views/main/home/home.component';
+import { ListadoPedidosView } from '../presentation/views/pedidos/listado-pedidos/listado-pedidos.component';
 import { DetallePedidoView } from '../presentation/views/pedidos/detalle-pedido.view';
-import { EditarPedidoView } from '../presentation/views/pedidos/editar-pedido.view';
+import { EditarPedidoView } from '../presentation/views/pedidos/editar-insertar-pedido/editar-pedido.view';
 import { EnConstruccionView } from '../presentation/views/en-construccion/en-construccion.view';
 import { authGuard } from '../core/guards/auth.guard';
 
