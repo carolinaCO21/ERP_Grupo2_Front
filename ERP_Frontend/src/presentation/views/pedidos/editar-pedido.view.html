@@ -1,0 +1,260 @@
+<div class="app-layout">
+  <app-header></app-header>
+  
+  <div class="main-content">
+    <app-sidebar></app-sidebar>
+    
+    <main class="content-area">
+      <!-- Loading -->
+      <div class="loading-container" *ngIf="viewModel.cargando && !viewModel.proveedores.length">
+        <div class="spinner-large"></div>
+        <p>Cargando formulario...</p>
+      </div>
+
+      <!-- Formulario -->
+      <div class="form-container" *ngIf="!viewModel.cargando || viewModel.proveedores.length">
+        <div class="form-header">
+          <button [routerLink]="['/pedidos']" class="btn-back">
+            <span>←</span> Volver
+          </button>
+          <h1 class="page-title">
+            <span class="title-icon">{{ viewModel.modoEdicion ? '✏️' : '➕' }}</span>
+            {{ viewModel.modoEdicion ? 'Editar Pedido' : 'Nuevo Pedido' }}
+          </h1>
+        </div>
+
+        <!-- Error general -->
+        <div class="error-message" *ngIf="viewModel.error">
+          <span class="error-icon">⚠️</span>
+          {{ viewModel.error }}
+        </div>
+
+        <form class="pedido-form">
+          <!-- Sección: Información General -->
+          <div class="form-section">
+            <h2 class="section-title">
+              <span class="section-icon">📋</span>
+              Información General
+            </h2>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="proveedor" class="form-label required">
+                  Proveedor
+                </label>
+                <select
+                  id="proveedor"
+                  class="form-input"
+                  [(ngModel)]="viewModel.proveedorSeleccionado"
+                  (change)="onProveedorChange($event)"
+                  name="proveedor"
+                  [disabled]="viewModel.modoEdicion"
+                  required>
+                  <option [ngValue]="null">Seleccione un proveedor...</option>
+                  <option
+                    *ngFor="let proveedor of viewModel.proveedores"
+                    [ngValue]="proveedor.id">
+                    {{ proveedor.nombreEmpresa }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-group" *ngIf="viewModel.modoEdicion">
+                <label for="estado" class="form-label required">
+                  Estado del Pedido
+                </label>
+                <select
+                  id="estado"
+                  class="form-input"
+                  [(ngModel)]="viewModel.estadoSeleccionado"
+                  name="estado"
+                  required>
+                  <option
+                    *ngFor="let estado of viewModel.obtenerEstadosDisponibles()"
+                    [value]="estado">
+                    {{ estado.replace('_', ' ') }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="direccion" class="form-label required">
+                Dirección de Entrega
+              </label>
+              <textarea
+                id="direccion"
+                class="form-textarea"
+                [(ngModel)]="viewModel.direccionEntrega"
+                name="direccion"
+                rows="3"
+                placeholder="Ingrese la dirección completa de entrega..."
+                required>
+              </textarea>
+            </div>
+          </div>
+
+          <!-- Sección: Líneas de Pedido -->
+          <div class="form-section">
+            <div class="section-header">
+              <h2 class="section-title">
+                <span class="section-icon">📦</span>
+                Líneas del Pedido
+              </h2>
+              <button
+                type="button"
+                class="btn btn-add"
+                (click)="onAgregarLinea()"
+                [disabled]="!viewModel.proveedorSeleccionado">
+                <span>➕</span> Agregar Línea
+              </button>
+            </div>
+
+            <div class="info-box" *ngIf="!viewModel.proveedorSeleccionado">
+              <span class="info-icon">ℹ️</span>
+              Debe seleccionar un proveedor antes de agregar líneas de pedido
+            </div>
+
+            <div class="lineas-list" *ngIf="viewModel.lineasPedido.length > 0">
+              <div
+                *ngFor="let linea of viewModel.lineasPedido; let i = index"
+                class="linea-item">
+                <div class="linea-header">
+                  <span class="linea-numero">Línea {{ i + 1 }}</span>
+                  <button
+                    type="button"
+                    class="btn-remove"
+                    (click)="onEliminarLinea(i)">
+                    <span>🗑️</span> Eliminar
+                  </button>
+                </div>
+
+                <div class="linea-grid">
+                  <div class="form-group">
+                    <label class="form-label">Producto</label>
+                    <select
+                      class="form-input"
+                      [(ngModel)]="linea.idProducto"
+                      (change)="onProductoChange(i, $event)"
+                      [name]="'producto_' + i"
+                      required>
+                      <option
+                        *ngFor="let producto of viewModel.productosDisponibles"
+                        [ngValue]="producto.idProducto">
+                        {{ producto.nombreProducto }} ({{ producto.codigoProducto }})
+                      </option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Cantidad</label>
+                    <input
+                      type="number"
+                      class="form-input"
+                      [(ngModel)]="linea.cantidad"
+                      [name]="'cantidad_' + i"
+                      min="1"
+                      step="1"
+                      required />
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Precio Unitario</label>
+                    <input
+                      type="number"
+                      class="form-input"
+                      [(ngModel)]="linea.precioUnitario"
+                      [name]="'precio_' + i"
+                      min="0"
+                      step="0.01"
+                      required />
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">IVA %</label>
+                    <input
+                      type="number"
+                      class="form-input"
+                      [(ngModel)]="linea.ivaPorcentaje"
+                      [name]="'iva_' + i"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                      required />
+                  </div>
+                </div>
+
+                <div class="linea-totals">
+                  <div class="total-item">
+                    <span class="total-label">Subtotal:</span>
+                    <span class="total-value">{{ viewModel.calcularSubtotalLinea(linea) | currency: 'EUR' }}</span>
+                  </div>
+                  <div class="total-item">
+                    <span class="total-label">IVA:</span>
+                    <span class="total-value">{{ viewModel.calcularIvaLinea(linea) | currency: 'EUR' }}</span>
+                  </div>
+                  <div class="total-item final">
+                    <span class="total-label">Total:</span>
+                    <span class="total-value">{{ viewModel.calcularTotalLinea(linea) | currency: 'EUR' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="empty-lineas" *ngIf="viewModel.lineasPedido.length === 0 && viewModel.proveedorSeleccionado">
+              <span class="empty-icon">📋</span>
+              <p>No hay líneas de pedido. Haga clic en "Agregar Línea" para comenzar.</p>
+            </div>
+          </div>
+
+          <!-- Sección: Totales -->
+          <div class="form-section totales-section" *ngIf="viewModel.lineasPedido.length > 0">
+            <h2 class="section-title">
+              <span class="section-icon">💰</span>
+              Resumen del Pedido
+            </h2>
+
+            <div class="totales-card">
+              <div class="total-row">
+                <span class="total-label">Subtotal:</span>
+                <span class="total-value">{{ viewModel.calcularSubtotalGeneral() | currency: 'EUR' }}</span>
+              </div>
+              <div class="total-row">
+                <span class="total-label">Impuestos (IVA):</span>
+                <span class="total-value">{{ viewModel.calcularImpuestosGeneral() | currency: 'EUR' }}</span>
+              </div>
+              <div class="total-row total-final">
+                <span class="total-label">TOTAL:</span>
+                <span class="total-value">{{ viewModel.calcularTotalGeneral() | currency: 'EUR' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botones de acción -->
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn btn-cancel"
+              (click)="onCancelar()"
+              [disabled]="viewModel.cargando">
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn btn-save"
+              (click)="onGuardar()"
+              [disabled]="viewModel.cargando">
+              <span *ngIf="!viewModel.cargando">
+                {{ viewModel.modoEdicion ? 'Actualizar Pedido' : 'Crear Pedido' }}
+              </span>
+              <span *ngIf="viewModel.cargando" class="loading">
+                <span class="spinner"></span>
+                Guardando...
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+</div>

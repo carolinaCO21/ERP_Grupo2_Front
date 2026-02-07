@@ -1,0 +1,55 @@
+<div class="pedido-card">
+  <div class="card-header">
+    <div class="pedido-numero">
+      <span class="label">Pedido:</span>
+      <span class="valor">{{ pedido.numeroPedido }}</span>
+    </div>
+    <span class="badge-estado" [ngClass]="obtenerClaseEstado(pedido.estado)">
+      {{ obtenerTextoEstado(pedido.estado) }}
+    </span>
+  </div>
+
+  <div class="card-body">
+    <div class="info-row">
+      <span class="icono">🏢</span>
+      <div class="info-content">
+        <span class="info-label">Proveedor:</span>
+        <span class="info-valor">{{ pedido.nombreProveedor }}</span>
+      </div>
+    </div>
+
+    <div class="info-row">
+      <span class="icono">📅</span>
+      <div class="info-content">
+        <span class="info-label">Fecha:</span>
+        <span class="info-valor">{{ pedido.fechaPedido | date: 'dd/MM/yyyy' }}</span>
+      </div>
+    </div>
+
+    <div class="info-row total">
+      <span class="icono">💰</span>
+      <div class="info-content">
+        <span class="info-label">Total:</span>
+        <span class="info-valor precio">{{ pedido.total | currency: 'EUR' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    <button 
+      [routerLink]="['/pedidos', pedido.id]" 
+      class="btn btn-primary">
+      Ver Detalle
+    </button>
+    <button 
+      [routerLink]="['/pedidos/editar', pedido.id]" 
+      class="btn btn-secondary">
+      Editar
+    </button>
+    <button 
+      (click)="onEliminar($event)" 
+      class="btn btn-danger">
+      Eliminar
+    </button>
+  </div>
+</div>

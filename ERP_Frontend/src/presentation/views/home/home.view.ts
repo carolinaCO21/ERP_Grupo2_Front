@@ -1,0 +1,28 @@
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { HeaderComponent } from '../../components/header/header.component';
+import { SidebarComponent } from '../../components/sidebar/sidebar.component';
+
+@Component({
+  selector: 'app-home-view',
+  standalone: true,
+  imports: [CommonModule, RouterModule, HeaderComponent, SidebarComponent],
+  templateUrl: './home.view.html',
+  styleUrls: ['./home.view.css']
+})
+export class HomeView {
+  nombreUsuario: string = '';
+
+  constructor() {
+    this.cargarDatosUsuario();
+  }
+
+  private cargarDatosUsuario(): void {
+    const user = localStorage.getItem('currentUser');
+    if (user) {
+      const userData = JSON.parse(user);
+      this.nombreUsuario = userData.nombre;
+    }
+  }
+}

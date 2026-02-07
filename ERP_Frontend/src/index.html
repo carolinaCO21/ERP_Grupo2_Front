@@ -1,13 +1,51 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="utf-8">
-  <title>ERPFrontend</title>
+  <title>AndalucíaERP - Sistema de Gestión Empresarial</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Sistema ERP para la gestión de pedidos a proveedores - Junta de Andalucía">
+  <meta name="theme-color" content="#667eea">
+  
+  <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  
+  <!-- Preconnect para mejorar rendimiento -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>
 <body>
-  <app-root></app-root>
+  <app-root>
+    <!-- Loading spinner mientras carga la aplicación -->
+    <div style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    ">
+      <div style="text-align: center; color: white;">
+        <div style="
+          width: 60px;
+          height: 60px;
+          border: 6px solid rgba(255, 255, 255, 0.3);
+          border-top-color: white;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 20px;
+        "></div>
+        <h2 style="font-family: sans-serif; font-size: 24px; margin: 0;">
+          Cargando AndalucíaERP...
+        </h2>
+      </div>
+    </div>
+    
+    <style>
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+  </app-root>
 </body>
 </html>

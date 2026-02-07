@@ -1,0 +1,12 @@
+/* 
+  App Component - Componente Raíz
+  
+  Este componente actúa como contenedor principal.
+  Los estilos específicos están en cada vista/componente.
+*/
+
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+}

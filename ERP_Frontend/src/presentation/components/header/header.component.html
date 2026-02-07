@@ -1,0 +1,19 @@
+<header class="app-header">
+  <div class="header-container">
+    <div class="header-brand">
+      <h1 class="empresa-nombre">{{ nombreEmpresa }}</h1>
+      <span class="separador">|</span>
+      <h2 class="erp-nombre">{{ nombreERP }}</h2>
+    </div>
+    
+    <div class="header-actions">
+      <div class="user-info">
+        <span class="user-icon">👤</span>
+        <span class="user-name">{{ usuarioActual }}</span>
+      </div>
+      <button class="btn-logout" (click)="cerrarSesion()">
+        Cerrar Sesión
+      </button>
+    </div>
+  </div>
+</header>

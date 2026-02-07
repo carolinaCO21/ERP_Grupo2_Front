@@ -1,0 +1,25 @@
+<aside class="sidebar" [class.collapsed]="estaColapsado">
+  <button class="toggle-btn" (click)="toggleSidebar()">
+    <span *ngIf="!estaColapsado">◀</span>
+    <span *ngIf="estaColapsado">▶</span>
+  </button>
+
+  <nav class="sidebar-nav">
+    <ul class="menu-list">
+      <li *ngFor="let item of menuItems" class="menu-item">
+        <a 
+          [routerLink]="item.ruta" 
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{exact: item.ruta === '/home'}"
+          class="menu-link"
+          [class.disabled]="!item.activo">
+          <span class="menu-icon">{{ item.icono }}</span>
+          <span class="menu-text" *ngIf="!estaColapsado">{{ item.texto }}</span>
+          <span class="badge-construccion" *ngIf="!item.activo && !estaColapsado">
+            En construcción
+          </span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</aside>

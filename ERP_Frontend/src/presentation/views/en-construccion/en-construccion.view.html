@@ -1,0 +1,73 @@
+<div class="app-layout">
+  <app-header></app-header>
+  
+  <div class="main-content">
+    <app-sidebar></app-sidebar>
+    
+    <main class="content-area">
+      <div class="construccion-container">
+        <div class="construccion-content">
+          <div class="icon-container">
+            <span class="main-icon">🚧</span>
+          </div>
+
+          <h1 class="title">Módulo en Construcción</h1>
+          
+          <p class="description">
+            Esta funcionalidad está actualmente en desarrollo y estará disponible 
+            una vez que la Junta de Andalucía nos adjudique el contrato completo del ERP.
+          </p>
+
+          <div class="timeline">
+            <div class="timeline-item completed">
+              <div class="timeline-icon">✅</div>
+              <div class="timeline-content">
+                <h3>Fase 1 - Pedidos a Proveedores</h3>
+                <p>Completado y disponible para evaluación</p>
+              </div>
+            </div>
+
+            <div class="timeline-item current">
+              <div class="timeline-icon">⏳</div>
+              <div class="timeline-content">
+                <h3>Fase 2 - Evaluación del Concurso</h3>
+                <p>En espera de adjudicación del contrato</p>
+              </div>
+            </div>
+
+            <div class="timeline-item pending">
+              <div class="timeline-icon">🔮</div>
+              <div class="timeline-content">
+                <h3>Fase 3 - Desarrollo Completo</h3>
+                <p>Implementación de todos los módulos restantes</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="modulos-planificados">
+            <h2 class="section-title">Módulos Planificados</h2>
+            <div class="modulos-grid">
+              <div *ngFor="let modulo of modulos" class="modulo-card">
+                <span class="modulo-icon">{{ modulo.icono }}</span>
+                <h3 class="modulo-nombre">{{ modulo.nombre }}</h3>
+                <p class="modulo-descripcion">{{ modulo.descripcion }}</p>
+                <span class="badge-proxima">Próximamente</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="cta-section">
+            <p class="cta-text">
+              Mientras tanto, puede explorar el módulo de Pedidos a Proveedores 
+              que está completamente funcional.
+            </p>
+            <button [routerLink]="['/pedidos']" class="btn-primary">
+              <span class="btn-icon">📦</span>
+              Ir a Pedidos a Proveedores
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
