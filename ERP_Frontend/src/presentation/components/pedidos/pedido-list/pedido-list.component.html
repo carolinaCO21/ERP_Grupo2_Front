@@ -1,0 +1,61 @@
+<div class="pedido-list-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando pedidos...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage && !isLoading" class="error-state">
+    <span class="error-icon">⚠️</span>
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && !errorMessage && pedidos.length === 0" class="empty-state">
+    <span class="empty-icon">📭</span>
+    <h3>No hay pedidos</h3>
+    <p>Aún no se han registrado pedidos en el sistema</p>
+  </div>
+
+  <!-- Pedidos List -->
+  <div *ngIf="!isLoading && pedidos.length > 0" class="pedidos-grid">
+    <div *ngFor="let pedido of pedidos" class="pedido-card">
+      <div class="card-header">
+        <div class="pedido-info">
+          <h3 class="pedido-numero">{{ pedido.numeroPedido }}</h3>
+          <span class="badge" [ngClass]="pedido.estadoBadgeClass">
+            {{ pedido.estado }}
+          </span>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="info-row">
+          <span class="label">Proveedor:</span>
+          <span class="value">{{ pedido.nombreProveedor }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Fecha:</span>
+          <span class="value">{{ pedido.fechaFormateada }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Total:</span>
+          <span class="value total">{{ pedido.totalFormateado }}</span>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button class="btn btn-view" (click)="onVerDetalle(pedido.id)">
+          <span>👁️</span> Ver
+        </button>
+        <button class="btn btn-edit" (click)="onEditar(pedido.id)">
+          <span>✏️</span> Editar
+        </button>
+        <button class="btn btn-delete" (click)="onEliminar(pedido.id)">
+          <span>🗑️</span> Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,31 @@
+<div class="construccion-container">
+  <div class="construccion-content">
+    <div class="icon-container">
+      <span class="main-icon">🚧</span>
+    </div>
+    
+    <h1 class="title">Módulo En Construcción</h1>
+    <p class="subtitle">Este módulo estará disponible próximamente</p>
+    
+    <div class="info-section">
+      <h2>Módulos Planificados:</h2>
+      <div class="modulos-grid">
+        <div *ngFor="let modulo of modulosPendientes" class="modulo-card">
+          <span class="modulo-icon">{{ modulo.icon }}</span>
+          <span class="modulo-nombre">{{ modulo.nombre }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="actions">
+      <button [routerLink]="['/home/pedidos/listado']" class="btn-primary">
+        <span>📦</span>
+        Ir a Pedidos (Módulo Funcional)
+      </button>
+      <button [routerLink]="['/home/dashboard']" class="btn-secondary">
+        <span>🏠</span>
+        Volver al Dashboard
+      </button>
+    </div>
+  </div>
+</div>

@@ -8,7 +8,7 @@ import { PedidoFormComponent } from '../../../components/pedidos/pedido-form/ped
   standalone: true,
   imports: [CommonModule, PedidoFormComponent],
   templateUrl: './editar-insertar-pedido.component.html',
-  styleUrls: ['./editar-insertar-pedido.component.css'],
+  styleUrls: ['./editar-insertar-pedido.component.scss'],
   providers: [EditarInsertarPedidoViewModel]
 })
 export class EditarInsertarPedidoComponent implements OnInit {

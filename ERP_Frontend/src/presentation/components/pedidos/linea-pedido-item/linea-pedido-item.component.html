@@ -1,82 +1,50 @@
-<div class="linea-pedido-item">
-  <div class="linea-numero">
-    <span class="numero-badge">{{ index + 1 }}</span>
+<div class="linea-item" [class.error]="linea.tieneError" *ngIf="linea">
+  <div class="linea-header">
+    <span class="linea-numero">Línea {{ index + 1 }}</span>
+    <button
+      *ngIf="esEditable"
+      class="btn-remove"
+      (click)="onEliminar()">
+      🗑️
+    </button>
   </div>
 
   <div class="linea-content">
-    <div class="form-row">
-      <!-- Producto -->
-      <div class="form-group flex-2">
-        <label [attr.for]="'producto-' + index">Producto *</label>
-        <select
-          [id]="'producto-' + index"
-          class="form-control"
-          [value]="linea.idProducto"
-          (change)="onProductoChange($event)">
-          <option value="0">Seleccione un producto</option>
-          <option *ngFor="let producto of productos" [value]="producto.idProducto">
-            {{ producto.codigoProducto }} - {{ producto.nombreProducto }}
-          </option>
-        </select>
+    <div class="linea-info">
+      <div class="info-group">
+        <span class="label">Producto:</span>
+        <span class="value">{{ linea.nombreProducto }}</span>
       </div>
-
-      <!-- Cantidad -->
-      <div class="form-group">
-        <label [attr.for]="'cantidad-' + index">Cantidad *</label>
-        <input
-          [id]="'cantidad-' + index"
-          type="number"
-          class="form-control"
-          min="1"
-          [value]="linea.cantidad"
-          (input)="onCantidadChange($event)">
+      
+      <div class="info-group">
+        <span class="label">Cantidad:</span>
+        <span class="value">{{ linea.cantidad }}</span>
       </div>
-
-      <!-- Precio Unitario -->
-      <div class="form-group">
-        <label [attr.for]="'precio-' + index">Precio Unit. (€) *</label>
-        <input
-          [id]="'precio-' + index"
-          type="number"
-          class="form-control"
-          min="0"
-          step="0.01"
-          [value]="linea.precioUnitario"
-          (input)="onPrecioChange($event)">
+      
+      <div class="info-group">
+        <span class="label">Precio Unit.:</span>
+        <span class="value">{{ linea.precioUnitario | currency: 'EUR' }}</span>
       </div>
-
-      <!-- IVA % -->
-      <div class="form-group">
-        <label [attr.for]="'iva-' + index">IVA % *</label>
-        <select
-          [id]="'iva-' + index"
-          class="form-control"
-          [value]="linea.ivaPorcentaje"
-          (change)="onIvaChange($event)">
-          <option value="0">0%</option>
-          <option value="4">4%</option>
-          <option value="10">10%</option>
-          <option value="21">21%</option>
-        </select>
+      
+      <div class="info-group">
+        <span class="label">IVA:</span>
+        <span class="value">{{ linea.ivaPorcentaje }}%</span>
       </div>
+    </div>
 
-      <!-- Total de la línea -->
-      <div class="form-group">
-        <label>Total</label>
-        <div class="total-display">
-          {{ calcularTotal() | currency: 'EUR' }}
-        </div>
+    <div class="linea-totales">
+      <div class="total-item">
+        <span class="label">Subtotal:</span>
+        <span class="value">{{ linea.subtotalFormateado }}</span>
+      </div>
+      <div class="total-item final">
+        <span class="label">Total:</span>
+        <span class="value">{{ linea.totalLineaFormateado }}</span>
       </div>
     </div>
   </div>
 
-  <div class="linea-actions">
-    <button
-      type="button"
-      class="btn-delete"
-      (click)="onEliminar()"
-      title="Eliminar línea">
-      🗑️
-    </button>
+  <div class="error-message" *ngIf="linea.tieneError && linea.mensajeError">
+    ⚠️ {{ linea.mensajeError }}
   </div>
 </div>

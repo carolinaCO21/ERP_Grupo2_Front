@@ -1,40 +1,26 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { LogoutUseCase } from '../../../../domain/usecases/auth/logout.usecase';
+import { UsuarioMockRepository } from '../../../../data/repositories/usuario.repository.mock';
 
 @Component({
   selector: 'app-header',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css']
+  styleUrls: ['./header.component.scss']
 })
-export class HeaderComponent implements OnInit {
-  nombreEmpresa: string = 'TechSolutions';
-  nombreERP: string = 'AndalucíaERP';
-  usuarioActual: string = '';
+export class HeaderComponent {
+  private usuarioRepository = inject(UsuarioMockRepository);
+  private router = inject(Router);
 
-  constructor(
-    private logoutUseCase: LogoutUseCase,
-    private router: Router
-  ) {}
-
-  ngOnInit(): void {
-    // Obtener usuario actual del localStorage o servicio
-    const user = localStorage.getItem('currentUser');
-    if (user) {
-      const userData = JSON.parse(user);
-      this.usuarioActual = `${userData.nombre} ${userData.apellidos}`;
-    }
+  get nombreUsuario(): string {
+    const user = this.usuarioRepository.getCurrentUser();
+    return user ? user.nombre : 'Usuario';
   }
 
-  async cerrarSesion(): Promise<void> {
-    try {
-      await this.logoutUseCase.execute();
-      this.router.navigate(['/login']);
-    } catch (error) {
-      console.error('Error al cerrar sesión:', error);
-    }
+  async logout(): Promise<void> {
+    await this.usuarioRepository.logout();
+    await this.router.navigate(['/login']);
   }
 }

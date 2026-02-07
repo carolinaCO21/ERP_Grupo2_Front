@@ -1,0 +1,62 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>📊 Dashboard</h1>
+    <p class="subtitle">Resumen del sistema de gestión de pedidos</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div *ngFor="let stat of stats" class="stat-card" [style.border-left-color]="stat.color">
+      <div class="stat-icon" [style.background]="stat.color + '20'">
+        <span>{{ stat.icon }}</span>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">{{ stat.label }}</p>
+        <h2 class="stat-value">{{ stat.value }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions-section">
+    <h2 class="section-title">⚡ Acciones Rápidas</h2>
+    <div class="actions-grid">
+      <a
+        *ngFor="let action of quickActions"
+        [routerLink]="action.route"
+        class="action-card"
+        [style.background]="action.color">
+        <span class="action-icon">{{ action.icon }}</span>
+        <span class="action-label">{{ action.label }}</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="recent-activity-section">
+    <h2 class="section-title">📝 Actividad Reciente</h2>
+    <div class="activity-card">
+      <div class="activity-item">
+        <span class="activity-icon">✅</span>
+        <div class="activity-content">
+          <p class="activity-text">Pedido #PED-2024-001 completado</p>
+          <span class="activity-time">Hace 2 horas</span>
+        </div>
+      </div>
+      <div class="activity-item">
+        <span class="activity-icon">📦</span>
+        <div class="activity-content">
+          <p class="activity-text">Nuevo pedido creado: #PED-2024-002</p>
+          <span class="activity-time">Hace 5 horas</span>
+        </div>
+      </div>
+      <div class="activity-item">
+        <span class="activity-icon">🏭</span>
+        <div class="activity-content">
+          <p class="activity-text">Nuevo proveedor registrado: Suministros SA</p>
+          <span class="activity-time">Hace 1 día</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

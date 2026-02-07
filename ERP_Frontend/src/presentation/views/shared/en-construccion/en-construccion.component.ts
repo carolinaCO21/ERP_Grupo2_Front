@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { EnConstruccionComponent as EnConstruccionSharedComponent } from '../../../components/shared/en-construccion/en-construccion.component';
 
 @Component({
-  selector: 'app-en-construccion',
+  selector: 'app-en-construccion-view',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, EnConstruccionSharedComponent],
   templateUrl: './en-construccion.component.html',
-  styleUrls: ['./en-construccion.component.css']
+  styleUrls: ['./en-construccion.component.scss']
 })
-export class EnConstruccionComponent {
+export class EnConstruccionViewComponent {
 }

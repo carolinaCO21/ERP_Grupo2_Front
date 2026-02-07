@@ -8,7 +8,7 @@ import { LoginViewModel } from '../../../viewmodels/auth/login.viewmodel';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'],
+  styleUrls: ['./login.component.scss'],
   providers: [LoginViewModel]
 })
 export class LoginComponent {

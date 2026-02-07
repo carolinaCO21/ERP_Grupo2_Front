@@ -1,124 +1,52 @@
-<div class="app-layout">
-  <app-header></app-header>
-  
-  <div class="main-content">
-    <app-sidebar></app-sidebar>
-    
-    <main class="content-area">
-      <div class="page-header">
-        <div class="header-content">
-          <h1 class="page-title">
-            <span class="title-icon">📦</span>
-            Pedidos a Proveedores
-          </h1>
-          <button 
-            [routerLink]="['/pedidos/nuevo']" 
-            class="btn btn-primary">
-            <span class="btn-icon">➕</span>
-            Nuevo Pedido
-          </button>
-        </div>
-      </div>
-
-      <!-- Filtros -->
-      <div class="filters-section">
-        <div class="search-box">
-          <span class="search-icon">🔍</span>
-          <input
-            type="text"
-            class="search-input"
-            placeholder="Buscar por número de pedido o proveedor..."
-            [value]="filtroBusqueda"
-            (input)="onBuscar($event)"
-          />
-        </div>
-
-        <div class="filter-chips">
-          <button
-            class="filter-chip"
-            [class.active]="filtroEstado === ''"
-            (click)="onFiltrarEstado('')">
-            Todos
-            <span class="chip-count">{{ pedidos.length }}</span>
-          </button>
-
-          <button
-            *ngFor="let estado of obtenerEstadosDisponibles()"
-            class="filter-chip"
-            [class.active]="filtroEstado === estado"
-            (click)="onFiltrarEstado(estado)">
-            {{ estado.replace('_', ' ') }}
-            <span class="chip-count">{{ obtenerCantidadPorEstado(estado) }}</span>
-          </button>
-
-          <button
-            *ngIf="filtroEstado || filtroBusqueda"
-            class="btn-clear-filters"
-            (click)="onLimpiarFiltros()">
-            <span>✖</span> Limpiar filtros
-          </button>
-        </div>
-      </div>
-
-      <!-- Resumen -->
-      <div class="summary-section" *ngIf="pedidosFiltrados.length > 0">
-        <div class="summary-card">
-          <span class="summary-label">Total de pedidos:</span>
-          <span class="summary-value">{{ pedidosFiltrados.length }}</span>
-        </div>
-        <div class="summary-card">
-          <span class="summary-label">Valor total:</span>
-          <span class="summary-value total">{{ calcularTotalGeneral() | currency: 'EUR' }}</span>
-        </div>
-      </div>
-
-      <!-- Loading -->
-      <div class="loading-container" *ngIf="cargando">
-        <div class="spinner-large"></div>
-        <p>Cargando pedidos...</p>
-      </div>
-
-      <!-- Error -->
-      <div class="error-container" *ngIf="error && !cargando">
-        <span class="error-icon">⚠️</span>
-        <p>{{ error }}</p>
-        <button class="btn btn-secondary" (click)="ngOnInit()">
-          Reintentar
-        </button>
-      </div>
-
-      <!-- Sin resultados -->
-      <div class="empty-state" *ngIf="!cargando && !error && pedidosFiltrados.length === 0">
-        <div class="empty-icon">📭</div>
-        <h3>No se encontraron pedidos</h3>
-        <p *ngIf="filtroEstado || filtroBusqueda">
-          Intenta ajustar los filtros de búsqueda
-        </p>
-        <p *ngIf="!filtroEstado && !filtroBusqueda">
-          Comienza creando tu primer pedido
-        </p>
-        <button
-          *ngIf="filtroEstado || filtroBusqueda"
-          class="btn btn-secondary"
-          (click)="onLimpiarFiltros()">
-          Limpiar filtros
-        </button>
-        <button
-          *ngIf="!filtroEstado && !filtroBusqueda"
-          [routerLink]="['/pedidos/nuevo']"
-          class="btn btn-primary">
-          Crear primer pedido
-        </button>
-      </div>
-
-      <!-- Listado de pedidos -->
-      <div class="pedidos-grid" *ngIf="!cargando && !error && pedidosFiltrados.length > 0">
-        <app-pedido-card
-          *ngFor="let pedido of pedidosFiltrados"
-          [pedido]="pedido"
-          (eliminar)="onEliminarPedido($event)">
-        </app-pedido-card>
-      </div>
-    </main>
+<div class="listado-pedidos-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1>📦 Listado de Pedidos</h1>
+      <button class="btn-nuevo" (click)="vm.nuevoPedido()">
+        ➕ Nuevo Pedido
+      </button>
+    </div>
   </div>
+
+  <!-- Filtros -->
+  <div class="filters-section">
+    <div class="filters-content">
+      <div class="filter-group">
+        <label>Estado:</label>
+        <select [(ngModel)]="vm.filtroEstado" (change)="vm.filtrarPorEstado(vm.filtroEstado())">
+          <option value="">Todos</option>
+          <option value="PENDIENTE">Pendiente</option>
+          <option value="APROBADO">Aprobado</option>
+          <option value="EN_PROCESO">En Proceso</option>
+          <option value="ENVIADO">Enviado</option>
+          <option value="RECIBIDO">Recibido</option>
+          <option value="CANCELADO">Cancelado</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Proveedor:</label>
+        <select [(ngModel)]="vm.filtroProveedor" (change)="vm.filtrarPorProveedor(vm.filtroProveedor()!)">
+          <option [ngValue]="null">Todos</option>
+          <option *ngFor="let proveedor of vm.proveedores()" [ngValue]="proveedor.id">
+            {{ proveedor.nombreEmpresa }}
+          </option>
+        </select>
+      </div>
+
+      <button class="btn-limpiar" (click)="vm.limpiarFiltros()">
+        🔄 Limpiar Filtros
+      </button>
+    </div>
+  </div>
+
+  <!-- Lista de Pedidos -->
+  <app-pedido-list
+    [pedidos]="vm.pedidos()"
+    [isLoading]="vm.isLoading()"
+    [errorMessage]="vm.errorMessage()"
+    (eliminar)="vm.eliminarPedido($event)"
+    (verDetalle)="vm.verDetalle($event)"
+    (editar)="vm.editarPedido($event)">
+  </app-pedido-list>
 </div>

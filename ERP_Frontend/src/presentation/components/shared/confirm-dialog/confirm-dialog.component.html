@@ -1,0 +1,20 @@
+<div class="dialog-overlay" *ngIf="isVisible" (click)="onCancel()">
+  <div class="dialog-content" (click)="$event.stopPropagation()">
+    <div class="dialog-header">
+      <h2>{{ title }}</h2>
+    </div>
+    
+    <div class="dialog-body">
+      <p>{{ message }}</p>
+    </div>
+    
+    <div class="dialog-actions">
+      <button class="btn btn-cancel" (click)="onCancel()">
+        {{ cancelText }}
+      </button>
+      <button class="btn btn-confirm" (click)="onConfirm()">
+        {{ confirmText }}
+      </button>
+    </div>
+  </div>
+</div>

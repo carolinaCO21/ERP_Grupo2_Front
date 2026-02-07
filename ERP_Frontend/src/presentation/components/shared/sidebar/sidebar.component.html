@@ -1,25 +1,17 @@
-<aside class="sidebar" [class.collapsed]="estaColapsado">
+<aside class="sidebar" [class.collapsed]="isCollapsed()">
   <button class="toggle-btn" (click)="toggleSidebar()">
-    <span *ngIf="!estaColapsado">◀</span>
-    <span *ngIf="estaColapsado">▶</span>
+    <span *ngIf="!isCollapsed()">◀</span>
+    <span *ngIf="isCollapsed()">▶</span>
   </button>
 
   <nav class="sidebar-nav">
-    <ul class="menu-list">
-      <li *ngFor="let item of menuItems" class="menu-item">
-        <a 
-          [routerLink]="item.ruta" 
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{exact: item.ruta === '/home'}"
-          class="menu-link"
-          [class.disabled]="!item.activo">
-          <span class="menu-icon">{{ item.icono }}</span>
-          <span class="menu-text" *ngIf="!estaColapsado">{{ item.texto }}</span>
-          <span class="badge-construccion" *ngIf="!item.activo && !estaColapsado">
-            En construcción
-          </span>
-        </a>
-      </li>
-    </ul>
+    <a
+      *ngFor="let item of menuItems"
+      [routerLink]="item.route"
+      routerLinkActive="active"
+      class="nav-item">
+      <span class="nav-icon">{{ item.icon }}</span>
+      <span class="nav-label" *ngIf="!isCollapsed()">{{ item.label }}</span>
+    </a>
   </nav>
 </aside>

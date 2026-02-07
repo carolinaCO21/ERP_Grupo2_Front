@@ -1,17 +1,18 @@
 <header class="app-header">
-  <div class="header-container">
-    <div class="header-brand">
-      <h1 class="empresa-nombre">{{ nombreEmpresa }}</h1>
-      <span class="separador">|</span>
-      <h2 class="erp-nombre">{{ nombreERP }}</h2>
+  <div class="header-content">
+    <div class="header-title">
+      <h1>AndalucíaERP</h1>
+      <span class="subtitle">Sistema de Gestión de Pedidos</span>
     </div>
     
     <div class="header-actions">
       <div class="user-info">
         <span class="user-icon">👤</span>
-        <span class="user-name">{{ usuarioActual }}</span>
+        <span class="user-name">{{ nombreUsuario }}</span>
       </div>
-      <button class="btn-logout" (click)="cerrarSesion()">
+      
+      <button class="btn-logout" (click)="logout()">
+        <span>🚪</span>
         Cerrar Sesión
       </button>
     </div>

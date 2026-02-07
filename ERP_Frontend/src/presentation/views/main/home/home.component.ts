@@ -5,24 +5,11 @@ import { HeaderComponent } from '../../../components/shared/header/header.compon
 import { SidebarComponent } from '../../../components/shared/sidebar/sidebar.component';
 
 @Component({
-  selector: 'app-home-view',
+  selector: 'app-home',
   standalone: true,
   imports: [CommonModule, RouterModule, HeaderComponent, SidebarComponent],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrls: ['./home.component.scss']
 })
 export class HomeComponent {
-  nombreUsuario: string = '';
-
-  constructor() {
-    this.cargarDatosUsuario();
-  }
-
-  private cargarDatosUsuario(): void {
-    const user = localStorage.getItem('currentUser');
-    if (user) {
-      const userData = JSON.parse(user);
-      this.nombreUsuario = userData.nombre;
-    }
-  }
 }
