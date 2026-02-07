@@ -5,8 +5,8 @@ import { RouterOutlet } from '@angular/router';
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrls: ['./app.css']
+  template: '<router-outlet></router-outlet>',
+  styles: []
 })
 export class AppComponent {
   title = 'AndalucíaERP';
