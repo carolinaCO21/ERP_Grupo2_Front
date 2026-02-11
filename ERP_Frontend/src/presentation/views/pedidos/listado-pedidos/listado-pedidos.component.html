@@ -13,7 +13,7 @@
     <div class="filters-content">
       <div class="filter-group">
         <label>Estado:</label>
-        <select [(ngModel)]="vm.filtroEstado" (change)="vm.filtrarPorEstado(vm.filtroEstado())">
+        <select [value]="vm.filtroEstado()" (change)="vm.filtrarPorEstado($any($event.target).value)">
           <option value="">Todos</option>
           <option value="PENDIENTE">Pendiente</option>
           <option value="APROBADO">Aprobado</option>
@@ -26,9 +26,9 @@
 
       <div class="filter-group">
         <label>Proveedor:</label>
-        <select [(ngModel)]="vm.filtroProveedor" (change)="vm.filtrarPorProveedor(vm.filtroProveedor()!)">
-          <option [ngValue]="null">Todos</option>
-          <option *ngFor="let proveedor of vm.proveedores()" [ngValue]="proveedor.id">
+        <select (change)="onProveedorFilterChange($any($event.target).value)">
+          <option value="">Todos</option>
+          <option *ngFor="let proveedor of vm.proveedores()" [value]="proveedor.id">
             {{ proveedor.nombreEmpresa }}
           </option>
         </select>

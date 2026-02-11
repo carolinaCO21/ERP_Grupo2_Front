@@ -1,11 +1,12 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { LoginUseCase } from '../../../domain/usecases/auth/login.usecase';
+import { Router } from '@angular/router';  // ✅ AGREGAR
+import { LoginUseCase } from '../../../application/usecases/auth/login.usecase';
 
 @Injectable()
 export class LoginViewModel {
   private loginUseCase = inject(LoginUseCase);
+  private router = inject(Router);  // ✅ AGREGAR
   
-  // Signals para estado reactivo
   isLoading = signal(false);
   errorMessage = signal('');
   
@@ -20,6 +21,7 @@ export class LoginViewModel {
     
     try {
       await this.loginUseCase.execute(email, password);
+      await this.router.navigate(['/home/dashboard']);  // ✅ AGREGAR
     } catch (error: any) {
       this.errorMessage.set(error.message || 'Error al iniciar sesión');
     } finally {

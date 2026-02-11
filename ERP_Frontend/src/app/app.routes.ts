@@ -55,8 +55,8 @@ export const routes: Routes = [
       },
       {
         path: 'pedidos/detalle/:id',
-        loadComponent: () => import('../presentation/views/pedidos/listado-pedidos/listado-pedidos.component')
-          .then(m => m.ListadoPedidosComponent),
+        loadComponent: () => import('../presentation/views/pedidos/detalle-pedido/detalle-pedido.component')
+          .then(m => m.DetallePedidoComponent),
         title: 'Detalle de Pedido - AndalucíaERP'
       }
     ]

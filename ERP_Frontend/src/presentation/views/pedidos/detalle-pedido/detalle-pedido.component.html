@@ -1,0 +1,178 @@
+<div class="detalle-pedido-container">
+  <!-- Loading State -->
+  <app-loading-spinner *ngIf="vm.isLoading()" message="Cargando pedido..."></app-loading-spinner>
+
+  <!-- Error State -->
+  <div *ngIf="vm.errorMessage() && !vm.isLoading()" class="error-state">
+    <span class="error-icon">⚠️</span>
+    <p>{{ vm.errorMessage() }}</p>
+    <button class="btn-volver" (click)="vm.volverAlListado()">
+      ← Volver al Listado
+    </button>
+  </div>
+
+  <!-- Pedido Detail -->
+  <div *ngIf="vm.pedido() && !vm.isLoading()" class="pedido-detail">
+    <!-- Header -->
+    <div class="detail-header">
+      <div class="header-info">
+        <button class="btn-back" (click)="vm.volverAlListado()">
+          ← Volver
+        </button>
+        <h1>📦 Pedido {{ vm.pedido()!.numeroPedido }}</h1>
+        <span class="badge" [ngClass]="vm.getEstadoBadgeClass(vm.pedido()!.estado)">
+          {{ vm.pedido()!.estado }}
+        </span>
+      </div>
+      <div class="header-actions">
+        <button class="btn-cambiar-estado" (click)="vm.abrirCambioEstado()">
+          🔄 Cambiar Estado
+        </button>
+        <button class="btn-editar" (click)="vm.editarPedido()">
+          ✏️ Editar Pedido
+        </button>
+      </div>
+    </div>
+
+    <!-- Información General -->
+    <div class="info-section">
+      <h2 class="section-title">📋 Información General</h2>
+      <div class="info-grid">
+        <div class="info-card">
+          <span class="info-label">Fecha del Pedido:</span>
+          <span class="info-value">{{ vm.formatearFecha(vm.pedido()!.fechaPedido) }}</span>
+        </div>
+        <div class="info-card">
+          <span class="info-label">Creado por:</span>
+          <span class="info-value">{{ vm.pedido()!.nombreUsuario }}</span>
+        </div>
+        <div class="info-card">
+          <span class="info-label">Dirección de Entrega:</span>
+          <span class="info-value">{{ vm.pedido()!.direccionEntrega }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información del Proveedor -->
+    <div class="info-section">
+      <h2 class="section-title">🏭 Información del Proveedor</h2>
+      <div class="proveedor-card">
+        <div class="proveedor-header">
+          <h3>{{ vm.pedido()!.nombreProveedor }}</h3>
+        </div>
+        <div class="proveedor-info">
+          <div class="info-row">
+            <span class="label">CIF:</span>
+            <span class="value">{{ vm.pedido()!.proveedor.cif }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Email:</span>
+            <span class="value">{{ vm.pedido()!.proveedor.email }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Teléfono:</span>
+            <span class="value">{{ vm.pedido()!.proveedor.telefono }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Dirección:</span>
+            <span class="value">{{ vm.pedido()!.proveedor.direccion }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Líneas del Pedido -->
+    <div class="info-section">
+      <h2 class="section-title">📦 Líneas del Pedido</h2>
+      <div class="lineas-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th class="text-center">Cantidad</th>
+              <th class="text-right">Precio Unit.</th>
+              <th class="text-center">IVA %</th>
+              <th class="text-right">Subtotal</th>
+              <th class="text-right">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let linea of vm.pedido()!.lineasPedido">
+              <td>
+                <div class="producto-info">
+                  <span class="producto-nombre">{{ linea.nombreProducto }}</span>
+                  <span class="producto-ref">Ref: {{ linea.referenciaProducto }}</span>
+                </div>
+              </td>
+              <td class="text-center">{{ linea.cantidad }}</td>
+              <td class="text-right">{{ vm.formatearMoneda(linea.precioUnitario) }}</td>
+              <td class="text-center">{{ linea.ivaPorcentaje }}%</td>
+              <td class="text-right">{{ vm.formatearMoneda(linea.subtotal) }}</td>
+              <td class="text-right total-cell">{{ vm.formatearMoneda(linea.totalLinea) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Resumen Financiero -->
+    <div class="info-section">
+      <h2 class="section-title">💰 Resumen Financiero</h2>
+      <div class="resumen-card">
+        <div class="resumen-row">
+          <span class="resumen-label">Subtotal:</span>
+          <span class="resumen-value">{{ vm.formatearMoneda(vm.pedido()!.subtotal) }}</span>
+        </div>
+        <div class="resumen-row">
+          <span class="resumen-label">IVA Total:</span>
+          <span class="resumen-value">{{ vm.formatearMoneda(vm.pedido()!.impuestos) }}</span>
+        </div>
+        <div class="resumen-row total">
+          <span class="resumen-label">TOTAL:</span>
+          <span class="resumen-value">{{ vm.formatearMoneda(vm.pedido()!.total) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Cambiar Estado -->
+  <div *ngIf="vm.mostrarCambioEstado()" class="modal-overlay" (click)="vm.cerrarCambioEstado()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>🔄 Cambiar Estado del Pedido</h2>
+        <button class="btn-close" (click)="vm.cerrarCambioEstado()">✕</button>
+      </div>
+      
+      <div class="modal-body">
+        <p class="modal-description">
+          Selecciona el nuevo estado para el pedido <strong>{{ vm.pedido()?.numeroPedido }}</strong>
+        </p>
+        
+        <div class="estado-actual">
+          <span class="label">Estado actual:</span>
+          <span class="badge" [ngClass]="vm.getEstadoBadgeClass(vm.pedido()!.estado)">
+            {{ vm.pedido()!.estado }}
+          </span>
+        </div>
+        
+        <div class="form-group">
+          <label>Nuevo Estado:</label>
+          <select [(ngModel)]="vm.nuevoEstado" class="select-estado">
+            <option *ngFor="let estado of vm.obtenerEstadosDisponibles()" [ngValue]="estado">
+              {{ estado }}
+            </option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn btn-cancel" (click)="vm.cerrarCambioEstado()">
+          Cancelar
+        </button>
+        <button class="btn btn-confirm" (click)="vm.cambiarEstado()" [disabled]="vm.isLoading()">
+          {{ vm.isLoading() ? 'Guardando...' : 'Confirmar Cambio' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

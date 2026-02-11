@@ -10,6 +10,7 @@ import { ProductoProveedorDTO } from '../../../domain/dtos/producto-proveedor.dt
 import { LineaPedidoCreateDTO } from '../../../domain/dtos/linea-pedido-create.dto';
 import { PedidoCreateDTO } from '../../../domain/dtos/pedido-create.dto';
 import { PedidoUpdateDTO } from '../../../domain/dtos/pedido-update.dto';
+// TODO: Cambiar a abstracción cuando exista UsuarioRepository en domain
 import { UsuarioMockRepository } from '../../../data/repositories/usuario.repository.mock';
 import { EstadoPedido } from '../../../domain/enums/estado-pedido.enum';
 
@@ -149,6 +150,10 @@ export class EditarInsertarPedidoViewModel {
   
   async cancelar(): Promise<void> {
     await this.router.navigate(['/home/pedidos/listado']);
+  }
+  
+  obtenerEstadosDisponibles(): EstadoPedido[] {
+    return Object.values(EstadoPedido);
   }
   
   private async crearPedido(): Promise<void> {
