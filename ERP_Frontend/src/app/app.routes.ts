@@ -58,17 +58,39 @@ export const routes: Routes = [
         loadComponent: () => import('../presentation/views/pedidos/detalle-pedido/detalle-pedido.component')
           .then(m => m.DetallePedidoComponent),
         title: 'Detalle de Pedido - AndalucíaERP'
+      },
+      // Módulos en construcción
+      {
+        path: 'proveedores',
+        loadComponent: () => import('../presentation/views/shared/en-construccion/en-construccion.component')
+          .then(m => m.EnConstruccionViewComponent),
+        title: 'Proveedores - AndalucíaERP'
+      },
+      {
+        path: 'productos',
+        loadComponent: () => import('../presentation/views/shared/en-construccion/en-construccion.component')
+          .then(m => m.EnConstruccionViewComponent),
+        title: 'Productos - AndalucíaERP'
+      },
+      {
+        path: 'inventario',
+        loadComponent: () => import('../presentation/views/shared/en-construccion/en-construccion.component')
+          .then(m => m.EnConstruccionViewComponent),
+        title: 'Inventario - AndalucíaERP'
+      },
+      {
+        path: 'reportes',
+        loadComponent: () => import('../presentation/views/shared/en-construccion/en-construccion.component')
+          .then(m => m.EnConstruccionViewComponent),
+        title: 'Reportes - AndalucíaERP'
+      },
+      {
+        path: 'configuracion',
+        loadComponent: () => import('../presentation/views/shared/en-construccion/en-construccion.component')
+          .then(m => m.EnConstruccionViewComponent),
+        title: 'Configuración - AndalucíaERP'
       }
     ]
-  },
-
-  // En Construcción - Para módulos no desarrollados
-  { 
-    path: 'en-construccion',
-    loadComponent: () => import('../presentation/views/shared/en-construccion/en-construccion.component')
-      .then(m => m.EnConstruccionViewComponent),
-    canActivate: [authGuard],
-    title: 'En Construcción - AndalucíaERP'
   },
 
   // Wildcard - Redirige a login si la ruta no existe

@@ -3,10 +3,13 @@
   background: #2d3748;
   color: white;
   height: calc(100vh - 80px);
-  position: sticky;
+  position: fixed;
   top: 80px;
-  transition: width 0.3s ease;
-  overflow: hidden;
+  left: 0;
+  transition: width 0.3s ease, transform 0.3s ease;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 100;
 
   &.collapsed {
     width: 70px;
