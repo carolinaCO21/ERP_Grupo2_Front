@@ -1,10 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { PedidoMockRepository } from '../../../data/repositories/pedido.repository.mock';
+import { PedidoRepository } from '../../../data/repositories/pedido.repository';
 import { EstadoPedido } from '../../enums/estado-pedido.enum';
 
 @Injectable({ providedIn: 'root' })
 export class DeletePedidoUseCase {
-  private pedidoRepository = inject(PedidoMockRepository);
+  private pedidoRepository = inject(PedidoRepository);
 
   async execute(id: number): Promise<boolean> {
     // 🛡️ LÓGICA DE NEGOCIO: Obtener el pedido antes de eliminar
