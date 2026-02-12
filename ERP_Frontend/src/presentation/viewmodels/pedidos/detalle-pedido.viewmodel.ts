@@ -1,7 +1,6 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
-
 import { PedidoDetailDTO } from '../../../domain/dtos/pedido-detail.dto';
 import { EstadoPedido } from '../../../domain/enums/estado-pedido.enum';
 import { GetPedidoByIdUseCase } from '../../../domain/usecases/pedidos/get-pedido-by-id.usecase';
@@ -52,35 +51,15 @@ export class DetallePedidoViewModel {
     });
   });
   
-  // Computed signals - Cálculos financieros
-  subtotal = computed(() => {
-    const pedido = this.pedido();
-    if (!pedido) return 0;
-    
-    return pedido.lineasPedido.reduce((sum, linea) => {
-      return sum + (linea.cantidad * linea.precioUnitario);
-    }, 0);
-  });
+  // Computed signals - Cálculos financieros (del DTO)
+  subtotal = computed(() => this.pedido()?.subtotal || 0);
   
-  totalImpuestos = computed(() => {
-    const pedido = this.pedido();
-    if (!pedido) return 0;
-    
-    return pedido.lineasPedido.reduce((sum, linea) => {
-      const subtotal = linea.cantidad * linea.precioUnitario;
-      const iva = subtotal * (linea.ivaPorcentaje / 100);
-      return sum + iva;
-    }, 0);
-  });
+  totalImpuestos = computed(() => this.pedido()?.impuestos || 0);
   
-  total = computed(() => {
-    return this.subtotal() + this.totalImpuestos();
-  });
+  total = computed(() => this.pedido()?.total || 0);
   
   // Computed signals - Información del proveedor
   nombreProveedor = computed(() => this.pedido()?.nombreProveedor || '');
-  emailProveedor = computed(() => this.pedido()?.emailProveedor || '');
-  telefonoProveedor = computed(() => this.pedido()?.telefonoProveedor || '');
   
   // Computed signals - Estados disponibles para cambio
   puedeEditarEstado = computed(() => {
