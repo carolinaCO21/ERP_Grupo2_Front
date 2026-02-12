@@ -9,7 +9,7 @@ import { SidebarComponent } from '../../../components/shared/sidebar/sidebar.com
   standalone: true,
   imports: [CommonModule, RouterModule, HeaderComponent, SidebarComponent],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.css']
 })
 export class HomeComponent {
 }

@@ -7,7 +7,7 @@ import { RouterModule } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './en-construccion.component.html',
-  styleUrls: ['./en-construccion.component.scss']
+  styleUrls: ['./en-construccion.component.css']
 })
 export class EnConstruccionComponent {
   modulosPendientes = [

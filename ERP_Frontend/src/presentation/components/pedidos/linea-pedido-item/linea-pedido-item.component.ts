@@ -7,7 +7,7 @@ import { LineaPedidoUIModel } from '../../../models/linea-ui.model';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './linea-pedido-item.component.html',
-  styleUrls: ['./linea-pedido-item.component.scss']
+  styleUrls: ['./linea-pedido-item.component.css']
 })
 export class LineaPedidoItemComponent {
   @Input() linea!: LineaPedidoUIModel;

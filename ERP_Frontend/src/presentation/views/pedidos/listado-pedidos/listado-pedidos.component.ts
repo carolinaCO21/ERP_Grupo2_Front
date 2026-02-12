@@ -9,7 +9,7 @@ import { PedidoListComponent } from '../../../components/pedidos/pedido-list/ped
   standalone: true,
   imports: [CommonModule, PedidoListComponent],  // ✅ Sin FormsModule
   templateUrl: './listado-pedidos.component.html',
-  styleUrls: ['./listado-pedidos.component.scss'],
+  styleUrls: ['./listado-pedidos.component.css'],
   providers: [ListadoPedidosViewModel]
 })
 export class ListadoPedidosComponent implements OnInit {

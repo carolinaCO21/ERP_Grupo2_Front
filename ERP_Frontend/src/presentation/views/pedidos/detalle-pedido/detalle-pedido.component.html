@@ -6,7 +6,7 @@
   <div *ngIf="vm.errorMessage() && !vm.isLoading()" class="error-state">
     <span class="error-icon">⚠️</span>
     <p>{{ vm.errorMessage() }}</p>
-    <button class="btn-volver" (click)="vm.volverAlListado()">
+    <button class="btn-volver" (click)="vm.volver()">
       ← Volver al Listado
     </button>
   </div>
@@ -16,19 +16,19 @@
     <!-- Header -->
     <div class="detail-header">
       <div class="header-info">
-        <button class="btn-back" (click)="vm.volverAlListado()">
+        <button class="btn-back" (click)="vm.volver()">
           ← Volver
         </button>
-        <h1>📦 Pedido {{ vm.pedido()!.numeroPedido }}</h1>
-        <span class="badge" [ngClass]="vm.getEstadoBadgeClass(vm.pedido()!.estado)">
-          {{ vm.pedido()!.estado }}
+        <h1>📦 Pedido {{ vm.numeroPedido() }}</h1>
+        <span class="badge" [ngClass]="vm.estadoBadgeClass()">
+          {{ vm.estado() }}
         </span>
       </div>
       <div class="header-actions">
-        <button class="btn-cambiar-estado" (click)="vm.abrirCambioEstado()">
+        <button class="btn-cambiar-estado" (click)="vm.abrirModalCambioEstado()">
           🔄 Cambiar Estado
         </button>
-        <button class="btn-editar" (click)="vm.editarPedido()">
+        <button class="btn-editar" (click)="vm.editar()">
           ✏️ Editar Pedido
         </button>
       </div>
@@ -40,7 +40,7 @@
       <div class="info-grid">
         <div class="info-card">
           <span class="info-label">Fecha del Pedido:</span>
-          <span class="info-value">{{ vm.formatearFecha(vm.pedido()!.fechaPedido) }}</span>
+          <span class="info-value">{{ vm.fechaFormateada() }}</span>
         </div>
         <div class="info-card">
           <span class="info-label">Creado por:</span>
@@ -58,24 +58,16 @@
       <h2 class="section-title">🏭 Información del Proveedor</h2>
       <div class="proveedor-card">
         <div class="proveedor-header">
-          <h3>{{ vm.pedido()!.nombreProveedor }}</h3>
+          <h3>{{ vm.nombreProveedor() }}</h3>
         </div>
         <div class="proveedor-info">
           <div class="info-row">
-            <span class="label">CIF:</span>
-            <span class="value">{{ vm.pedido()!.proveedor.cif }}</span>
-          </div>
-          <div class="info-row">
             <span class="label">Email:</span>
-            <span class="value">{{ vm.pedido()!.proveedor.email }}</span>
+            <span class="value">{{ vm.emailProveedor() }}</span>
           </div>
           <div class="info-row">
             <span class="label">Teléfono:</span>
-            <span class="value">{{ vm.pedido()!.proveedor.telefono }}</span>
-          </div>
-          <div class="info-row">
-            <span class="label">Dirección:</span>
-            <span class="value">{{ vm.pedido()!.proveedor.direccion }}</span>
+            <span class="value">{{ vm.telefonoProveedor() }}</span>
           </div>
         </div>
       </div>
@@ -101,14 +93,13 @@
               <td>
                 <div class="producto-info">
                   <span class="producto-nombre">{{ linea.nombreProducto }}</span>
-                  <span class="producto-ref">Ref: {{ linea.referenciaProducto }}</span>
                 </div>
               </td>
               <td class="text-center">{{ linea.cantidad }}</td>
-              <td class="text-right">{{ vm.formatearMoneda(linea.precioUnitario) }}</td>
+              <td class="text-right">{{ linea.precioUnitario | currency:'EUR' }}</td>
               <td class="text-center">{{ linea.ivaPorcentaje }}%</td>
-              <td class="text-right">{{ vm.formatearMoneda(linea.subtotal) }}</td>
-              <td class="text-right total-cell">{{ vm.formatearMoneda(linea.totalLinea) }}</td>
+              <td class="text-right">{{ vm.calcularSubtotalLinea(linea.cantidad, linea.precioUnitario) | currency:'EUR' }}</td>
+              <td class="text-right total-cell">{{ vm.calcularTotalLinea(linea.cantidad, linea.precioUnitario, linea.ivaPorcentaje) | currency:'EUR' }}</td>
             </tr>
           </tbody>
         </table>
@@ -121,44 +112,44 @@
       <div class="resumen-card">
         <div class="resumen-row">
           <span class="resumen-label">Subtotal:</span>
-          <span class="resumen-value">{{ vm.formatearMoneda(vm.pedido()!.subtotal) }}</span>
+          <span class="resumen-value">{{ vm.subtotal() | currency:'EUR' }}</span>
         </div>
         <div class="resumen-row">
           <span class="resumen-label">IVA Total:</span>
-          <span class="resumen-value">{{ vm.formatearMoneda(vm.pedido()!.impuestos) }}</span>
+          <span class="resumen-value">{{ vm.totalImpuestos() | currency:'EUR' }}</span>
         </div>
         <div class="resumen-row total">
           <span class="resumen-label">TOTAL:</span>
-          <span class="resumen-value">{{ vm.formatearMoneda(vm.pedido()!.total) }}</span>
+          <span class="resumen-value">{{ vm.total() | currency:'EUR' }}</span>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Modal Cambiar Estado -->
-  <div *ngIf="vm.mostrarCambioEstado()" class="modal-overlay" (click)="vm.cerrarCambioEstado()">
+  <div *ngIf="vm.mostrarModalCambioEstado()" class="modal-overlay" (click)="vm.cerrarModalCambioEstado()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h2>🔄 Cambiar Estado del Pedido</h2>
-        <button class="btn-close" (click)="vm.cerrarCambioEstado()">✕</button>
+        <button class="btn-close" (click)="vm.cerrarModalCambioEstado()">✕</button>
       </div>
       
       <div class="modal-body">
         <p class="modal-description">
-          Selecciona el nuevo estado para el pedido <strong>{{ vm.pedido()?.numeroPedido }}</strong>
+          Selecciona el nuevo estado para el pedido <strong>{{ vm.numeroPedido() }}</strong>
         </p>
         
         <div class="estado-actual">
           <span class="label">Estado actual:</span>
-          <span class="badge" [ngClass]="vm.getEstadoBadgeClass(vm.pedido()!.estado)">
-            {{ vm.pedido()!.estado }}
+          <span class="badge" [ngClass]="vm.estadoBadgeClass()">
+            {{ vm.estado() }}
           </span>
         </div>
         
         <div class="form-group">
           <label>Nuevo Estado:</label>
-          <select [(ngModel)]="vm.nuevoEstado" class="select-estado">
-            <option *ngFor="let estado of vm.obtenerEstadosDisponibles()" [ngValue]="estado">
+          <select [value]="vm.nuevoEstado()" (change)="vm.nuevoEstado.set($any($event.target).value)" class="select-estado">
+            <option *ngFor="let estado of vm.estadosDisponibles()" [value]="estado">
               {{ estado }}
             </option>
           </select>
@@ -166,10 +157,10 @@
       </div>
       
       <div class="modal-actions">
-        <button class="btn btn-cancel" (click)="vm.cerrarCambioEstado()">
+        <button class="btn btn-cancel" (click)="vm.cerrarModalCambioEstado()">
           Cancelar
         </button>
-        <button class="btn btn-confirm" (click)="vm.cambiarEstado()" [disabled]="vm.isLoading()">
+        <button class="btn btn-confirm" (click)="vm.confirmarCambioEstado()" [disabled]="vm.isLoading()">
           {{ vm.isLoading() ? 'Guardando...' : 'Confirmar Cambio' }}
         </button>
       </div>

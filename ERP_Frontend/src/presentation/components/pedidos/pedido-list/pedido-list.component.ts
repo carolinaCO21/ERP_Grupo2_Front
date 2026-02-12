@@ -7,7 +7,7 @@ import { PedidoUIModel } from '../../../models/pedido-ui.model';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './pedido-list.component.html',
-  styleUrls: ['./pedido-list.component.scss']
+  styleUrls: ['./pedido-list.component.css']
 })
 export class PedidoListComponent {
   @Input() pedidos: PedidoUIModel[] = [];

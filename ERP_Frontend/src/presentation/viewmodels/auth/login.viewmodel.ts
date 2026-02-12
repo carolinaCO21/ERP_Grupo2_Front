@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';  // ✅ AGREGAR
-import { LoginUseCase } from '../../../application/usecases/auth/login.usecase';
+import { LoginUseCase } from '../../../domain/usecases/auth/login.usecase';
+
 
 @Injectable()
 export class LoginViewModel {

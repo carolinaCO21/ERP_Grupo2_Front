@@ -8,7 +8,7 @@ import { EditarInsertarPedidoViewModel } from '../../../viewmodels/pedidos/edita
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './pedido-form.component.html',
-  styleUrls: ['./pedido-form.component.scss']
+  styleUrls: ['./pedido-form.component.css']
 })
 export class PedidoFormComponent {
   @Input() vm!: EditarInsertarPedidoViewModel;

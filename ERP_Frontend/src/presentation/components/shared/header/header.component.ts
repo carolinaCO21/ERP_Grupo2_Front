@@ -8,7 +8,7 @@ import { UsuarioMockRepository } from '../../../../data/repositories/usuario.rep
   standalone: true,
   imports: [CommonModule],
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss']
+  styleUrls: ['./header.component.css']
 })
 export class HeaderComponent {
   private usuarioRepository = inject(UsuarioMockRepository);

@@ -1,9 +1,11 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { GetPedidoByIdUseCase } from '../../../application/usecases/pedidos/get-pedido-by-id.usecase';
-import { UpdatePedidoUseCase } from '../../../application/usecases/pedidos/update-pedido.usecase';
+
+
 import { PedidoDetailDTO } from '../../../domain/dtos/pedido-detail.dto';
 import { EstadoPedido } from '../../../domain/enums/estado-pedido.enum';
+import { GetPedidoByIdUseCase } from '../../../domain/usecases/pedidos/get-pedido-by-id.usecase';
+import { UpdatePedidoUseCase } from '../../../domain/usecases/pedidos/update-pedido.usecase';
 
 @Injectable()
 export class DetallePedidoViewModel {
@@ -19,6 +21,8 @@ export class DetallePedidoViewModel {
   
   // Signals - Acciones
   isCambiandoEstado = signal(false);
+  mostrarModalCambioEstado = signal(false);
+  nuevoEstado = signal<EstadoPedido>(EstadoPedido.PENDIENTE);
   
   // Computed signals - Información derivada
   numeroPedido = computed(() => this.pedido()?.numeroPedido || '');
@@ -167,6 +171,22 @@ export class DetallePedidoViewModel {
     if (pedido) {
       this.router.navigate(['/home/pedidos/editar', pedido.id]);
     }
+  }
+  
+  abrirModalCambioEstado(): void {
+    this.mostrarModalCambioEstado.set(true);
+    const estadoActual = this.estado() as EstadoPedido;
+    this.nuevoEstado.set(estadoActual);
+  }
+  
+  cerrarModalCambioEstado(): void {
+    this.mostrarModalCambioEstado.set(false);
+  }
+  
+  async confirmarCambioEstado(): Promise<void> {
+    const nuevoEstadoSeleccionado = this.nuevoEstado();
+    await this.cambiarEstado(nuevoEstadoSeleccionado);
+    this.cerrarModalCambioEstado();
   }
   
   // Métodos auxiliares para cálculos de líneas individuales
