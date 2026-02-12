@@ -1,13 +1,14 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+
+import { PedidoUIModel } from '../../models/pedido-ui.model';
+import { ProveedorDTO } from '../../../domain/dtos/proveedor.dto';
+import { EstadoPedido } from '../../../domain/enums/estado-pedido.enum';
 import { GetPedidosUseCase } from '../../../domain/usecases/pedidos/get-pedidos.usecase';
 import { GetPedidosByProveedorUseCase } from '../../../domain/usecases/pedidos/get-pedidos-by-proveedor.usecase';
 import { GetPedidosByEstadoUseCase } from '../../../domain/usecases/pedidos/get-pedidos-by-estado.usecase';
 import { DeletePedidoUseCase } from '../../../domain/usecases/pedidos/delete-pedido.usecase';
 import { GetProveedoresUseCase } from '../../../domain/usecases/proveedores/get-proveedores.usecase';
-import { PedidoUIModel } from '../../models/pedido-ui.model';
-import { ProveedorDTO } from '../../../domain/dtos/proveedor.dto';
-import { EstadoPedido } from '../../../domain/enums/estado-pedido.enum';
 
 @Injectable()
 export class ListadoPedidosViewModel {
@@ -104,7 +105,8 @@ export class ListadoPedidosViewModel {
       await this.deletePedidoUseCase.execute(id);
       await this.cargarPedidos();
     } catch (error: any) {
-      this.errorMessage.set(error.message);
+      // El UseCase lanza un error si no se puede eliminar (ej: pedido RECIBIDO)
+      alert(error.message);
     }
   }
   
