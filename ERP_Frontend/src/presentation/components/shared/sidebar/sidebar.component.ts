@@ -15,11 +15,11 @@ export class SidebarComponent {
   menuItems = [
     { icon: '🏠', label: 'Dashboard', route: '/home/dashboard' },
     { icon: '📦', label: 'Pedidos', route: '/home/pedidos/listado' },
-    { icon: '🏭', label: 'Proveedores', route: '/en-construccion' },
-    { icon: '📦', label: 'Productos', route: '/en-construccion' },
-    { icon: '👥', label: 'Personal', route: '/en-construccion' },
-    { icon: '📊', label: 'Informes', route: '/en-construccion' },
-    { icon: '⚙️', label: 'Configuración', route: '/en-construccion' },
+    { icon: '🏭', label: 'Proveedores', route: '/home/proveedores' },
+    { icon: '📦', label: 'Productos', route: '/home/productos' },
+    { icon: '📊', label: 'Inventario', route: '/home/inventario' },
+    { icon: '📈', label: 'Reportes', route: '/home/reportes' },
+    { icon: '⚙️', label: 'Configuración', route: '/home/configuracion' },
   ];
 
   toggleSidebar(): void {

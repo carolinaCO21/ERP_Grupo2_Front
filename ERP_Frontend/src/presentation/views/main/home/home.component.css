@@ -2,22 +2,34 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  padding-top: 80px; 
 }
 
 .main-content {
   display: flex;
   flex: 1;
-  overflow: hidden;
+  position: relative;
+  height: calc(100vh - 80px);
 }
 
 .content-area {
   flex: 1;
   overflow-y: auto;
   background: #f7fafc;
+  margin-left: 250px; 
+  
+  &.sidebar-collapsed {
+    margin-left: 70px;
+  }
 }
 
 @media (max-width: 768px) {
   .main-content {
     flex-direction: column;
+    height: auto;
+  }
+  
+  .content-area {
+    margin-left: 0;
   }
 }
