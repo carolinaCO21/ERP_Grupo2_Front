@@ -13,7 +13,7 @@ import { routes } from './app.routes';
 import { authInterceptor } from '../core/interceptors/auth.interceptor';
 import { errorInterceptor } from '../core/interceptors/error.interceptor';
 
-// Mock Repositories (para desarrollo)
+// Repositorios (usando API REST)
 import { PedidoRepository } from '../data/repositories/pedido.repository';
 import { ProveedorRepository } from '../data/repositories/proveedor.repository';
 import { ProductoRepository } from '../data/repositories/producto.repository';
@@ -47,21 +47,10 @@ export const appConfig: ApplicationConfig = {
     // provideFirebaseApp(() => initializeApp(firebaseConfig)),
     // provideAuth(() => getAuth()),
 
-    // Mock Repositories (si está habilitado en environment)
-    ...(environment.useMocks ? [
-      { provide: 'RepositoriosMocking', useValue: true },
-      PedidoRepository,
-      ProveedorRepository,
-      ProductoRepository,
-      UsuarioRepository
-    ] : []),
-
-    // Log de estado de mocks
-    ...(() => {
-      if (environment.useMocks) {
-        console.log('%c🔧 USANDO REPOSITORIOS MOCK', 'color: #ff6b6b; font-weight: bold; font-size: 14px');
-      }
-      return [];
-    })()
+    // Repositorios (usando API REST)
+    PedidoRepository,
+    ProveedorRepository,
+    ProductoRepository,
+    UsuarioRepository
   ]
 };
