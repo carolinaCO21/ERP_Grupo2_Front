@@ -3,7 +3,6 @@ import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 // import { provideAnimations } from '@angular/platform-browser/animations';
 import { routes } from './app.routes';
-import { environment } from '../environments/environment';
 
 // Firebase - Comentado temporalmente por incompatibilidad de versiones
 // TODO: Instalar con: npm install @angular/fire@latest --legacy-peer-deps
@@ -14,11 +13,11 @@ import { environment } from '../environments/environment';
 import { authInterceptor } from '../core/interceptors/auth.interceptor';
 import { errorInterceptor } from '../core/interceptors/error.interceptor';
 
-// Mock Repositories (para desarrollo)
-import { PedidoMockRepository } from '../data/repositories/pedido.repository.mock';
-import { ProveedorMockRepository } from '../data/repositories/proveedor.repository.mock';
-import { ProductoMockRepository } from '../data/repositories/producto.repository.mock';
-import { UsuarioMockRepository } from '../data/repositories/usuario.repository.mock';
+// Repositorios (usando API REST)
+import { PedidoRepository } from '../data/repositories/pedido.repository';
+import { ProveedorRepository } from '../data/repositories/proveedor.repository';
+import { ProductoRepository } from '../data/repositories/producto.repository';
+import { UsuarioRepository } from '../data/repositories/usuario.repository';
 
 // Configuración de Firebase (comentado temporalmente)
 // IMPORTANTE: Reemplaza estos valores con los de tu proyecto Firebase
@@ -48,21 +47,10 @@ export const appConfig: ApplicationConfig = {
     // provideFirebaseApp(() => initializeApp(firebaseConfig)),
     // provideAuth(() => getAuth()),
 
-    // Mock Repositories (si está habilitado en environment)
-    ...(environment.useMocks ? [
-      { provide: 'RepositoriosMocking', useValue: true },
-      PedidoMockRepository,
-      ProveedorMockRepository,
-      ProductoMockRepository,
-      UsuarioMockRepository
-    ] : []),
-
-    // Log de estado de mocks
-    ...(() => {
-      if (environment.useMocks) {
-        console.log('%c🔧 USANDO REPOSITORIOS MOCK', 'color: #ff6b6b; font-weight: bold; font-size: 14px');
-      }
-      return [];
-    })()
+    // Repositorios (usando API REST)
+    PedidoRepository,
+    ProveedorRepository,
+    ProductoRepository,
+    UsuarioRepository
   ]
 };

@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { UsuarioMockRepository } from '../../../../data/repositories/usuario.repository.mock';
+import { UsuarioRepository } from '../../../../data/repositories/usuario.repository';
 
 @Component({
   selector: 'app-header',
@@ -11,7 +11,7 @@ import { UsuarioMockRepository } from '../../../../data/repositories/usuario.rep
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent {
-  private usuarioRepository = inject(UsuarioMockRepository);
+  private usuarioRepository = inject(UsuarioRepository);
   private router = inject(Router);
 
   get nombreUsuario(): string {

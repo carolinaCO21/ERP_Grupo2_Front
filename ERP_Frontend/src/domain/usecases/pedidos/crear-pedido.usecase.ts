@@ -1,11 +1,11 @@
 import { Injectable, inject } from '@angular/core';
-import { PedidoMockRepository } from '../../../data/repositories/pedido.repository.mock';
+import { PedidoRepository } from '../../../data/repositories/pedido.repository';
 import { PedidoCreateDTO } from '../../dtos/pedido-create.dto';
 import { PedidoDetailDTO } from '../../dtos/pedido-detail.dto';
 
 @Injectable({ providedIn: 'root' })
 export class CrearPedidoUseCase {
-  private pedidoRepository = inject(PedidoMockRepository);
+  private pedidoRepository = inject(PedidoRepository);
 
   async execute(pedidoCreateDto: PedidoCreateDTO): Promise<PedidoDetailDTO> {
     return await this.pedidoRepository.insertarPedido(pedidoCreateDto);

@@ -1,11 +1,11 @@
 import { Injectable, inject } from '@angular/core';
-import { UsuarioMockRepository } from '../../../data/repositories/usuario.repository.mock';
+import { UsuarioRepository } from '../../../data/repositories/usuario.repository';
 
 @Injectable({ providedIn: 'root' })
 export class LogoutUseCase {
-  private usuarioRepository = inject(UsuarioMockRepository);
+  private usuarioRepository = inject(UsuarioRepository);
 
   async execute(): Promise<void> {
-    return await this.usuarioRepository.logout();
+    await this.usuarioRepository.logout();
   }
 }

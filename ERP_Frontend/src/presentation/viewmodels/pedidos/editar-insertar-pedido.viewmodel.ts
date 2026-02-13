@@ -10,8 +10,7 @@ import { ProductoProveedorDTO } from '../../../domain/dtos/producto-proveedor.dt
 import { LineaPedidoCreateDTO } from '../../../domain/dtos/linea-pedido-create.dto';
 import { PedidoCreateDTO } from '../../../domain/dtos/pedido-create.dto';
 import { PedidoUpdateDTO } from '../../../domain/dtos/pedido-update.dto';
-// TODO: Cambiar a abstracción cuando exista UsuarioRepository en domain
-import { UsuarioMockRepository } from '../../../data/repositories/usuario.repository.mock';
+import { UsuarioRepository } from '../../../data/repositories/usuario.repository';
 import { EstadoPedido } from '../../../domain/enums/estado-pedido.enum';
 
 @Injectable()
@@ -21,7 +20,7 @@ export class EditarInsertarPedidoViewModel {
   private getPedidoByIdUseCase = inject(GetPedidoByIdUseCase);
   private getProveedoresUseCase = inject(GetProveedoresUseCase);
   private getProductosPorProveedorUseCase = inject(GetProductosPorProveedorUseCase);
-  private usuarioRepository = inject(UsuarioMockRepository);
+  private usuarioRepository = inject(UsuarioRepository);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   

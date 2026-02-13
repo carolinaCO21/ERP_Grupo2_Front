@@ -1,10 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { UsuarioMockRepository } from '../../../data/repositories/usuario.repository.mock';
+import { UsuarioRepository } from '../../../data/repositories/usuario.repository';
 import { UsuarioDTO } from '../../dtos/usuario.dto';
 
 @Injectable({ providedIn: 'root' })
 export class LoginUseCase {
-  private usuarioRepository = inject(UsuarioMockRepository);
+  private usuarioRepository = inject(UsuarioRepository);
 
   async execute(email: string, password: string): Promise<UsuarioDTO> {
     return await this.usuarioRepository.login(email, password);
