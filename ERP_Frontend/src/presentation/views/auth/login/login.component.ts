@@ -16,6 +16,11 @@ export class LoginComponent {
   
   email = '';
   password = '';
+  showPassword = false;
+  
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
   
   async onSubmit() {
     await this.vm.login(this.email, this.password);

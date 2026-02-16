@@ -141,6 +141,56 @@
   outline: none;
 }
 
+.password-wrapper {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+
+.password-wrapper .form-input {
+  /* Aseguramos que el input ocupe todo el ancho del contenedor
+     y dejamos padding a la derecha pequeño para que el caret no quede
+     debajo del icono (icono superpuesto). */
+  width: 100%;
+  box-sizing: border-box;
+  padding-right: 2.6rem;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.0);
+  border: none;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: #4a5568;
+  /* keep it above the input text without affecting layout */
+  pointer-events: auto;
+  z-index: 3;
+}
+
+.toggle-password:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.toggle-password .icon-eye,
+.toggle-password .icon-eye-off {
+  display: block;
+}
+
+.toggle-password:focus {
+  outline: none;
+}
+
 .form-input:focus {
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
