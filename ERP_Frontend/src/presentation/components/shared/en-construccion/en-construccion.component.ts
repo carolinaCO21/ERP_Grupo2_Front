@@ -11,11 +11,11 @@ import { RouterModule } from '@angular/router';
 })
 export class EnConstruccionComponent {
   modulosPendientes = [
-    { nombre: 'Gestión de Proveedores', icon: '🏭' },
-    { nombre: 'Catálogo de Productos', icon: '📦' },
-    { nombre: 'Gestión de Personal', icon: '👥' },
-    { nombre: 'Sistema de Informes', icon: '📊' },
-    { nombre: 'Configuración Avanzada', icon: '⚙️' },
-    { nombre: 'Control de Inventario', icon: '📋' },
+    { nombre: 'Gestion de Proveedores', icon: 'suppliers' },
+    { nombre: 'Catalogo de Productos', icon: 'products' },
+    { nombre: 'Gestion de Personal', icon: 'people' },
+    { nombre: 'Sistema de Informes', icon: 'reports' },
+    { nombre: 'Configuracion Avanzada', icon: 'settings' },
+    { nombre: 'Control de Inventario', icon: 'inventory' },
   ];
 }

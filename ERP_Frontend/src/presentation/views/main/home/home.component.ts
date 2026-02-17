@@ -12,4 +12,9 @@ import { SidebarComponent } from '../../../components/shared/sidebar/sidebar.com
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent {
+  sidebarCollapsed = false;
+
+  onSidebarToggle(collapsed: boolean): void {
+    this.sidebarCollapsed = collapsed;
+  }
 }

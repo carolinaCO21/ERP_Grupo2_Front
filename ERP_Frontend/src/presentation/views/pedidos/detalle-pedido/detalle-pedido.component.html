@@ -1,91 +1,90 @@
-<div class="detalle-pedido-container">
-  <!-- Loading State -->
+<div class="detalle-page">
+  <!-- Loading -->
   <app-loading-spinner *ngIf="vm.isLoading()" message="Cargando pedido..."></app-loading-spinner>
 
-  <!-- Error State -->
-  <div *ngIf="vm.errorMessage() && !vm.isLoading()" class="error-state">
-    <span class="error-icon">⚠️</span>
+  <!-- Error -->
+  <div *ngIf="vm.errorMessage() && !vm.isLoading()" class="error-card">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" x2="12" y1="8" y2="12"/>
+      <line x1="12" x2="12.01" y1="16" y2="16"/>
+    </svg>
     <p>{{ vm.errorMessage() }}</p>
-    <button class="btn-volver" (click)="vm.volver()">
-      ← Volver al Listado
+    <button class="btn-back-link" (click)="vm.volver()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      Volver al listado
     </button>
   </div>
 
-  <!-- Pedido Detail -->
-  <div *ngIf="vm.pedido() && !vm.isLoading()" class="pedido-detail">
+  <!-- Detail -->
+  <div *ngIf="vm.pedido() && !vm.isLoading()" class="detail-content">
     <!-- Header -->
     <div class="detail-header">
-      <div class="header-info">
-        <button class="btn-back" (click)="vm.volver()">
-          ← Volver
+      <div class="header-left">
+        <button class="btn-back-link" (click)="vm.volver()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          Volver
         </button>
-        <h1>📦 Pedido {{ vm.numeroPedido() }}</h1>
-        <span class="badge" [ngClass]="vm.estadoBadgeClass()">
-          {{ vm.estadoLabel() }}
-        </span>
+        <div class="header-title-row">
+          <h1>Pedido {{ vm.numeroPedido() }}</h1>
+          <span class="badge" [ngClass]="vm.estadoBadgeClass()">{{ vm.estadoLabel() }}</span>
+        </div>
       </div>
       <div class="header-actions">
-        <!-- Botón Avanzar Estado -->
-        <button
-          *ngIf="vm.siguienteEstado()"
-          class="btn-avanzar-estado"
-          (click)="vm.avanzarEstado()"
-          [disabled]="vm.isCambiandoEstado()">
-          {{ vm.isCambiandoEstado() ? 'Cambiando...' : '▶ Pasar a ' + vm.siguienteEstadoLabel() }}
+        <button *ngIf="vm.siguienteEstado()" class="btn btn-advance" (click)="vm.avanzarEstado()" [disabled]="vm.isCambiandoEstado()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          {{ vm.isCambiandoEstado() ? 'Cambiando...' : 'Pasar a ' + vm.siguienteEstadoLabel() }}
         </button>
-
-        <!-- Botón Cancelar Pedido -->
-        <button
-          *ngIf="vm.puedeCancelar()"
-          class="btn-cancelar-pedido"
-          (click)="vm.cancelarPedido()"
-          [disabled]="vm.isCambiandoEstado()">
-          ✕ Cancelar Pedido
+        <button *ngIf="vm.puedeCancelar()" class="btn btn-cancel-order" (click)="vm.cancelarPedido()" [disabled]="vm.isCambiandoEstado()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          Cancelar
         </button>
-
-        <!-- Botón Editar (solo si está Pendiente) -->
-        <button
-          *ngIf="vm.puedeEditar()"
-          class="btn-editar"
-          (click)="vm.editar()">
-          ✏️ Editar Pedido
+        <button *ngIf="vm.puedeEditar()" class="btn btn-edit" (click)="vm.editar()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+          Editar
         </button>
       </div>
     </div>
 
-    <!-- Información General -->
-    <div class="info-section">
-      <h2 class="section-title">📋 Información General</h2>
-      <div class="info-grid">
-        <div class="info-card">
-          <span class="info-label">Fecha del Pedido:</span>
-          <span class="info-value">{{ vm.fechaFormateada() }}</span>
+    <!-- Info Cards -->
+    <div class="info-grid">
+      <div class="info-section">
+        <h2 class="section-label">Informacion General</h2>
+        <div class="info-fields">
+          <div class="field">
+            <span class="field-label">Fecha del Pedido</span>
+            <span class="field-value">{{ vm.fechaFormateada() }}</span>
+          </div>
+          <div class="field">
+            <span class="field-label">Creado por</span>
+            <span class="field-value">{{ vm.pedido()!.nombreUsuario }}</span>
+          </div>
+          <div class="field">
+            <span class="field-label">Direccion de Entrega</span>
+            <span class="field-value">{{ vm.pedido()!.direccionEntrega }}</span>
+          </div>
         </div>
-        <div class="info-card">
-          <span class="info-label">Creado por:</span>
-          <span class="info-value">{{ vm.pedido()!.nombreUsuario }}</span>
-        </div>
-        <div class="info-card">
-          <span class="info-label">Dirección de Entrega:</span>
-          <span class="info-value">{{ vm.pedido()!.direccionEntrega }}</span>
+      </div>
+
+      <div class="info-section">
+        <h2 class="section-label">Proveedor</h2>
+        <div class="proveedor-box">
+          <div class="proveedor-avatar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 21a8 8 0 0 0-16 0"/>
+              <circle cx="10" cy="8" r="5"/>
+              <path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"/>
+            </svg>
+          </div>
+          <span class="proveedor-name">{{ vm.nombreProveedor() }}</span>
         </div>
       </div>
     </div>
 
-    <!-- Información del Proveedor -->
-    <div class="info-section">
-      <h2 class="section-title">🏭 Información del Proveedor</h2>
-      <div class="proveedor-card">
-        <div class="proveedor-header">
-          <h3>{{ vm.nombreProveedor() }}</h3>
-        </div>
-      </div>
-    </div>
-
-    <!-- Líneas del Pedido -->
-    <div class="info-section">
-      <h2 class="section-title">📦 Líneas del Pedido</h2>
-      <div class="lineas-table">
+    <!-- Lines Table -->
+    <div class="lines-section">
+      <h2 class="section-label">Lineas del Pedido</h2>
+      <div class="table-wrap">
         <table>
           <thead>
             <tr>
@@ -99,37 +98,32 @@
           </thead>
           <tbody>
             <tr *ngFor="let linea of vm.pedido()!.lineasPedido">
-              <td>
-                <div class="producto-info">
-                  <span class="producto-nombre">{{ linea.nombreProducto }}</span>
-                </div>
-              </td>
+              <td class="product-name">{{ linea.nombreProducto }}</td>
               <td class="text-center">{{ linea.cantidad }}</td>
               <td class="text-right">{{ linea.precioUnitario | currency:'EUR' }}</td>
               <td class="text-center">{{ linea.ivaPorcentaje }}%</td>
               <td class="text-right">{{ vm.calcularSubtotalLinea(linea.cantidad, linea.precioUnitario) | currency:'EUR' }}</td>
-              <td class="text-right total-cell">{{ vm.calcularTotalLinea(linea.cantidad, linea.precioUnitario, linea.ivaPorcentaje) | currency:'EUR' }}</td>
+              <td class="text-right fw-bold">{{ vm.calcularTotalLinea(linea.cantidad, linea.precioUnitario, linea.ivaPorcentaje) | currency:'EUR' }}</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- Resumen Financiero -->
-    <div class="info-section">
-      <h2 class="section-title">💰 Resumen Financiero</h2>
-      <div class="resumen-card">
-        <div class="resumen-row">
-          <span class="resumen-label">Subtotal:</span>
-          <span class="resumen-value">{{ vm.subtotal() | currency:'EUR' }}</span>
+    <!-- Summary -->
+    <div class="summary-section">
+      <div class="summary-card">
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span>{{ vm.subtotal() | currency:'EUR' }}</span>
         </div>
-        <div class="resumen-row">
-          <span class="resumen-label">IVA Total:</span>
-          <span class="resumen-value">{{ vm.totalImpuestos() | currency:'EUR' }}</span>
+        <div class="summary-row">
+          <span>IVA Total</span>
+          <span>{{ vm.totalImpuestos() | currency:'EUR' }}</span>
         </div>
-        <div class="resumen-row total">
-          <span class="resumen-label">TOTAL:</span>
-          <span class="resumen-value">{{ vm.total() | currency:'EUR' }}</span>
+        <div class="summary-row summary-total">
+          <span>TOTAL</span>
+          <span>{{ vm.total() | currency:'EUR' }}</span>
         </div>
       </div>
     </div>

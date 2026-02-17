@@ -1,31 +1,60 @@
-<div class="construccion-container">
-  <div class="construccion-content">
-    <div class="icon-container">
-      <span class="main-icon">🚧</span>
+<div class="wip-page">
+  <div class="wip-content">
+    <div class="wip-icon">
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2v4"/>
+        <path d="m6.41 6.41 2.83 2.83"/>
+        <path d="M2 12h4"/>
+        <path d="m17.17 9.24-2.83 2.83"/>
+        <path d="M22 12h-4"/>
+        <path d="m6.41 17.59 2.83-2.83"/>
+        <path d="M12 22v-4"/>
+        <path d="m14.83 14.83 2.83 2.83"/>
+      </svg>
     </div>
-    
-    <h1 class="title">Módulo En Construcción</h1>
-    <p class="subtitle">Este módulo estará disponible próximamente</p>
-    
-    <div class="info-section">
-      <h2>Módulos Planificados:</h2>
-      <div class="modulos-grid">
-        <div *ngFor="let modulo of modulosPendientes" class="modulo-card">
-          <span class="modulo-icon">{{ modulo.icon }}</span>
-          <span class="modulo-nombre">{{ modulo.nombre }}</span>
+
+    <h1>Modulo en Desarrollo</h1>
+    <p class="wip-desc">Este modulo estara disponible proximamente. Estamos trabajando para ofrecerte la mejor experiencia.</p>
+
+    <div class="modules-grid">
+      <div *ngFor="let modulo of modulosPendientes" class="module-card">
+        <div class="module-icon">
+          <svg *ngIf="modulo.icon === 'suppliers'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 21a8 8 0 0 0-16 0"/><circle cx="10" cy="8" r="5"/><path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"/>
+          </svg>
+          <svg *ngIf="modulo.icon === 'products'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>
+          </svg>
+          <svg *ngIf="modulo.icon === 'people'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <svg *ngIf="modulo.icon === 'reports'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>
+          </svg>
+          <svg *ngIf="modulo.icon === 'settings'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>
+          </svg>
+          <svg *ngIf="modulo.icon === 'inventory'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13H8"/><path d="M16 17H8"/><path d="M16 13h-2"/>
+          </svg>
         </div>
+        <span class="module-name">{{ modulo.nombre }}</span>
       </div>
     </div>
-    
-    <div class="actions">
-      <button [routerLink]="['/home/pedidos/listado']" class="btn-primary">
-        <span>📦</span>
-        Ir a Pedidos (Módulo Funcional)
-      </button>
-      <button [routerLink]="['/home/dashboard']" class="btn-secondary">
-        <span>🏠</span>
+
+    <div class="wip-actions">
+      <a [routerLink]="['/home/pedidos/listado']" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>
+        </svg>
+        Ir a Pedidos
+      </a>
+      <a [routerLink]="['/home/dashboard']" class="btn btn-ghost">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/>
+        </svg>
         Volver al Dashboard
-      </button>
+      </a>
     </div>
   </div>
 </div>

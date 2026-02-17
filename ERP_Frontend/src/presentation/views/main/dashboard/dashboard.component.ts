@@ -1,26 +1,27 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { DashboardViewModel } from '../../../viewmodels/dashboard/dashboard.viewmodel';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  styleUrls: ['./dashboard.component.css'],
+  providers: [DashboardViewModel]
 })
-export class DashboardComponent {
-  stats = [
-    { icon: '📦', label: 'Pedidos Activos', value: '24', color: '#667eea' },
-    { icon: '✅', label: 'Pedidos Completados', value: '156', color: '#48bb78' },
-    { icon: '⏳', label: 'Pedidos Pendientes', value: '8', color: '#f59e0b' },
-    { icon: '💰', label: 'Total Facturado', value: '45.230 €', color: '#8b5cf6' },
-  ];
+export class DashboardComponent implements OnInit {
+  vm = inject(DashboardViewModel);
 
   quickActions = [
-    { icon: '➕', label: 'Nuevo Pedido', route: '/home/pedidos/nuevo', color: '#667eea' },
-    { icon: '📋', label: 'Ver Pedidos', route: '/home/pedidos/listado', color: '#48bb78' },
- { icon: '🏭', label: 'Proveedores', route: '/home/proveedores', color: '#f59e0b' },
-{ icon: '📊', label: 'Informes', route: '/home/reportes', color: '#8b5cf6' },
+    { label: 'Nuevo Pedido', route: '/home/pedidos/nuevo', icon: 'plus' },
+    { label: 'Ver Pedidos', route: '/home/pedidos/listado', icon: 'list' },
+    { label: 'Proveedores', route: '/home/proveedores', icon: 'users' },
+    { label: 'Informes', route: '/home/reportes', icon: 'chart' },
   ];
+
+  async ngOnInit(): Promise<void> {
+    await this.vm.init();
+  }
 }

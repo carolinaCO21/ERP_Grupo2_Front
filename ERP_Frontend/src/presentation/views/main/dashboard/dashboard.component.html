@@ -1,60 +1,123 @@
-<div class="dashboard-container">
-  <div class="dashboard-header">
-    <h1>📊 Dashboard</h1>
-    <p class="subtitle">Resumen del sistema de gestión de pedidos</p>
-  </div>
-
-  <!-- Stats Cards -->
-  <div class="stats-grid">
-    <div *ngFor="let stat of stats" class="stat-card" [style.border-left-color]="stat.color">
-      <div class="stat-icon" [style.background]="stat.color + '20'">
-        <span>{{ stat.icon }}</span>
-      </div>
-      <div class="stat-content">
-        <p class="stat-label">{{ stat.label }}</p>
-        <h2 class="stat-value">{{ stat.value }}</h2>
-      </div>
+<div class="dashboard">
+  <div class="page-header">
+    <div>
+      <h1>Dashboard</h1>
+      <p class="page-desc">Resumen del sistema de gestion de pedidos</p>
     </div>
   </div>
 
-  <!-- Quick Actions -->
-  <div class="quick-actions-section">
-    <h2 class="section-title">⚡ Acciones Rápidas</h2>
-    <div class="actions-grid">
-      <a
-        *ngFor="let action of quickActions"
-        [routerLink]="action.route"
-        class="action-card"
-        [style.background]="action.color">
-        <span class="action-icon">{{ action.icon }}</span>
-        <span class="action-label">{{ action.label }}</span>
-      </a>
+  <!-- Loading -->
+  <div *ngIf="vm.isLoading()" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando datos...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="vm.errorMessage() && !vm.isLoading()" class="error-state">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>
+    </svg>
+    <span>{{ vm.errorMessage() }}</span>
+  </div>
+
+  <!-- Stats -->
+  <div *ngIf="!vm.isLoading()" class="stats-grid">
+    <div class="stat-card gradient-indigo" style="animation-delay: 0ms">
+      <div class="stat-header">
+        <span class="stat-label">Pedidos Activos</span>
+        <div class="stat-icon-wrap">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+            <path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-value">{{ vm.pedidosActivos() }}</div>
+      <div class="stat-change">En curso o pendientes de entrega</div>
+    </div>
+
+    <div class="stat-card gradient-emerald" style="animation-delay: 60ms">
+      <div class="stat-header">
+        <span class="stat-label">Completados</span>
+        <div class="stat-icon-wrap">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-value">{{ vm.pedidosCompletados() }}</div>
+      <div class="stat-change">Pedidos recibidos correctamente</div>
+    </div>
+
+    <div class="stat-card gradient-amber" style="animation-delay: 120ms">
+      <div class="stat-header">
+        <span class="stat-label">Pendientes</span>
+        <div class="stat-icon-wrap">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-value">{{ vm.pedidosPendientes() }}</div>
+      <div class="stat-change">Esperando aprobacion</div>
+    </div>
+
+    <div class="stat-card gradient-violet" style="animation-delay: 180ms">
+      <div class="stat-header">
+        <span class="stat-label">Total Facturado</span>
+        <div class="stat-icon-wrap">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 10h12"/><path d="M4 14h9"/>
+            <path d="M19 6a7.7 7.7 0 0 0-5.2-2A7.9 7.9 0 0 0 6 12c0 4.4 3.5 8 7.8 8 2 0 3.8-.8 5.2-2"/>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-value">{{ vm.totalFacturado() }}</div>
+      <div class="stat-change">Suma total de todos los pedidos</div>
     </div>
   </div>
 
-  <!-- Recent Activity -->
-  <div class="recent-activity-section">
-    <h2 class="section-title">📝 Actividad Reciente</h2>
-    <div class="activity-card">
-      <div class="activity-item">
-        <span class="activity-icon">✅</span>
-        <div class="activity-content">
-          <p class="activity-text">Pedido #PED-2024-001 completado</p>
-          <span class="activity-time">Hace 2 horas</span>
-        </div>
+  <div *ngIf="!vm.isLoading()" class="sections-grid">
+    <div class="section-card">
+      <h2 class="section-title">Acciones Rapidas</h2>
+      <div class="actions-list">
+        <a *ngFor="let action of quickActions" [routerLink]="action.route" class="action-item">
+          <div class="action-icon-wrap">
+            <svg *ngIf="action.icon === 'plus'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14"/><path d="M12 5v14"/>
+            </svg>
+            <svg *ngIf="action.icon === 'list'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/>
+              <line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>
+            </svg>
+            <svg *ngIf="action.icon === 'users'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            <svg *ngIf="action.icon === 'chart'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>
+            </svg>
+          </div>
+          <span class="action-label">{{ action.label }}</span>
+          <svg class="action-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6"/>
+          </svg>
+        </a>
       </div>
-      <div class="activity-item">
-        <span class="activity-icon">📦</span>
-        <div class="activity-content">
-          <p class="activity-text">Nuevo pedido creado: #PED-2024-002</p>
-          <span class="activity-time">Hace 5 horas</span>
-        </div>
+    </div>
+
+    <div class="section-card">
+      <h2 class="section-title">Actividad Reciente</h2>
+      <div *ngIf="vm.actividadReciente().length === 0" class="empty-activity">
+        <p>No hay actividad reciente</p>
       </div>
-      <div class="activity-item">
-        <span class="activity-icon">🏭</span>
-        <div class="activity-content">
-          <p class="activity-text">Nuevo proveedor registrado: Suministros SA</p>
-          <span class="activity-time">Hace 1 día</span>
+      <div class="activity-list">
+        <div *ngFor="let item of vm.actividadReciente()" class="activity-item">
+          <div class="activity-dot" [ngClass]="item.dotClass"></div>
+          <div class="activity-content">
+            <p class="activity-text">{{ item.texto }}</p>
+            <span class="activity-time">{{ item.fecha }}</span>
+          </div>
         </div>
       </div>
     </div>

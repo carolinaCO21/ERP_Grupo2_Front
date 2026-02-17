@@ -1,59 +1,77 @@
-<div class="pedido-list-container">
-  <!-- Loading State -->
-  <div *ngIf="isLoading" class="loading-state">
+<div class="pedido-list">
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="state-container">
     <div class="spinner"></div>
-    <p>Cargando pedidos...</p>
+    <p class="state-text">Cargando pedidos...</p>
   </div>
 
-  <!-- Error State -->
-  <div *ngIf="errorMessage && !isLoading" class="error-state">
-    <span class="error-icon">⚠️</span>
-    <p>{{ errorMessage }}</p>
+  <!-- Error -->
+  <div *ngIf="errorMessage && !isLoading" class="state-container state-error">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" x2="12" y1="8" y2="12"/>
+      <line x1="12" x2="12.01" y1="16" y2="16"/>
+    </svg>
+    <p class="state-text">{{ errorMessage }}</p>
   </div>
 
-  <!-- Empty State -->
-  <div *ngIf="!isLoading && !errorMessage && pedidos.length === 0" class="empty-state">
-    <span class="empty-icon">📭</span>
-    <h3>No hay pedidos</h3>
-    <p>Aún no se han registrado pedidos en el sistema</p>
+  <!-- Empty -->
+  <div *ngIf="!isLoading && !errorMessage && pedidos.length === 0" class="state-container">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="state-icon-muted">
+      <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+      <path d="m3.3 7 8.7 5 8.7-5"/>
+      <path d="M12 22V12"/>
+    </svg>
+    <h3 class="state-title">Sin pedidos</h3>
+    <p class="state-text">No se han encontrado pedidos en el sistema</p>
   </div>
 
-  <!-- Pedidos List -->
+  <!-- Pedidos Grid -->
   <div *ngIf="!isLoading && pedidos.length > 0" class="pedidos-grid">
     <div *ngFor="let pedido of pedidos" class="pedido-card">
-      <div class="card-header">
-        <div class="pedido-info">
-          <h3 class="pedido-numero">{{ pedido.numeroPedido }}</h3>
-          <span class="badge" [ngClass]="pedido.estadoBadgeClass">
-            {{ estadoLabel(pedido.estado) }}
-          </span>
-        </div>
+      <div class="card-top">
+        <span class="pedido-numero">{{ pedido.numeroPedido }}</span>
+        <span class="badge" [ngClass]="pedido.estadoBadgeClass">
+          {{ estadoLabel(pedido.estado) }}
+        </span>
       </div>
 
       <div class="card-body">
         <div class="info-row">
-          <span class="label">Proveedor:</span>
-          <span class="value">{{ pedido.nombreProveedor }}</span>
+          <span class="info-label">Proveedor</span>
+          <span class="info-value">{{ pedido.nombreProveedor }}</span>
         </div>
         <div class="info-row">
-          <span class="label">Fecha:</span>
-          <span class="value">{{ pedido.fechaFormateada }}</span>
+          <span class="info-label">Fecha</span>
+          <span class="info-value">{{ pedido.fechaFormateada }}</span>
         </div>
         <div class="info-row">
-          <span class="label">Total:</span>
-          <span class="value total">{{ pedido.totalFormateado }}</span>
+          <span class="info-label">Total</span>
+          <span class="info-value total">{{ pedido.totalFormateado }}</span>
         </div>
       </div>
 
       <div class="card-actions">
-        <button class="btn btn-view" (click)="onVerDetalle(pedido.id)">
-          <span>👁️</span> Ver
+        <button class="btn-action btn-primary" (click)="onVerDetalle(pedido.id)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          Ver
         </button>
-        <button *ngIf="esPendiente(pedido)" class="btn btn-edit" (click)="onEditar(pedido.id)">
-          <span>✏️</span> Editar
+        <button *ngIf="esPendiente(pedido)" class="btn-action btn-secondary" (click)="onEditar(pedido.id)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+          </svg>
+          Editar
         </button>
-        <button *ngIf="esPendiente(pedido)" class="btn btn-delete" (click)="onEliminar(pedido.id)">
-          <span>🗑️</span> Eliminar
+        <button *ngIf="esPendiente(pedido)" class="btn-action btn-danger" (click)="onEliminar(pedido.id)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18"/>
+            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+          </svg>
+          Eliminar
         </button>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -11,18 +11,20 @@ import { RouterModule } from '@angular/router';
 })
 export class SidebarComponent {
   isCollapsed = signal(false);
+  collapsedChange = output<boolean>();
 
   menuItems = [
-    { icon: '🏠', label: 'Dashboard', route: '/home/dashboard' },
-    { icon: '📦', label: 'Pedidos', route: '/home/pedidos/listado' },
-    { icon: '🏭', label: 'Proveedores', route: '/home/proveedores' },
-    { icon: '📦', label: 'Productos', route: '/home/productos' },
-    { icon: '📊', label: 'Inventario', route: '/home/inventario' },
-    { icon: '📈', label: 'Reportes', route: '/home/reportes' },
-    { icon: '⚙️', label: 'Configuración', route: '/home/configuracion' },
+    { label: 'Dashboard', route: '/home/dashboard', icon: 'dashboard' },
+    { label: 'Pedidos', route: '/home/pedidos/listado', icon: 'orders' },
+    { label: 'Proveedores', route: '/home/proveedores', icon: 'suppliers' },
+    { label: 'Productos', route: '/home/productos', icon: 'products' },
+    { label: 'Inventario', route: '/home/inventario', icon: 'inventory' },
+    { label: 'Reportes', route: '/home/reportes', icon: 'reports' },
+    { label: 'Configuracion', route: '/home/configuracion', icon: 'settings' },
   ];
 
   toggleSidebar(): void {
     this.isCollapsed.update(value => !value);
+    this.collapsedChange.emit(this.isCollapsed());
   }
 }
