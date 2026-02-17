@@ -1,21 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { DashboardViewModel } from '../../../viewmodels/dashboard/dashboard.viewmodel';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  styleUrls: ['./dashboard.component.css'],
+  providers: [DashboardViewModel]
 })
-export class DashboardComponent {
-  stats = [
-    { label: 'Pedidos Activos', value: '24', change: '+3 esta semana', icon: 'orders', gradient: 'gradient-indigo' },
-    { label: 'Completados', value: '156', change: '+12 este mes', icon: 'check', gradient: 'gradient-emerald' },
-    { label: 'Pendientes', value: '8', change: '2 urgentes', icon: 'clock', gradient: 'gradient-amber' },
-    { label: 'Total Facturado', value: '45.230 \u20ac', change: '+8% vs anterior', icon: 'euro', gradient: 'gradient-violet' },
-  ];
+export class DashboardComponent implements OnInit {
+  vm = inject(DashboardViewModel);
 
   quickActions = [
     { label: 'Nuevo Pedido', route: '/home/pedidos/nuevo', icon: 'plus' },
@@ -23,4 +20,8 @@ export class DashboardComponent {
     { label: 'Proveedores', route: '/home/proveedores', icon: 'users' },
     { label: 'Informes', route: '/home/reportes', icon: 'chart' },
   ];
+
+  async ngOnInit(): Promise<void> {
+    await this.vm.init();
+  }
 }

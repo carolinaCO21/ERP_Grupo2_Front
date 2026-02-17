@@ -62,8 +62,14 @@ export class ListadoPedidosViewModel {
   
   async filtrarPorEstado(estado: string): Promise<void> {
     this.filtroEstado.set(estado);
+
+    if (!estado) {
+      await this.cargarPedidos();
+      return;
+    }
+
     this.isLoading.set(true);
-    
+
     try {
       const pedidosDTO = await this.getPedidosByEstadoUseCase.execute(estado);
       const pedidosUI = pedidosDTO.map(p => this.toUIModel(p));
