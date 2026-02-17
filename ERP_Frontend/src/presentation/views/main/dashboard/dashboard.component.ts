@@ -20,7 +20,7 @@ export class DashboardComponent {
   quickActions = [
     { icon: '➕', label: 'Nuevo Pedido', route: '/home/pedidos/nuevo', color: '#667eea' },
     { icon: '📋', label: 'Ver Pedidos', route: '/home/pedidos/listado', color: '#48bb78' },
-    { icon: '🏭', label: 'Proveedores', route: '/en-construccion', color: '#f59e0b' },
-    { icon: '📊', label: 'Informes', route: '/en-construccion', color: '#8b5cf6' },
+ { icon: '🏭', label: 'Proveedores', route: '/home/proveedores', color: '#f59e0b' },
+{ icon: '📊', label: 'Informes', route: '/home/reportes', color: '#8b5cf6' },
   ];
 }
