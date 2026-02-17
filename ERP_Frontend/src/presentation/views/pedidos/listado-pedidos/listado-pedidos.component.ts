@@ -20,10 +20,6 @@ export class ListadoPedidosComponent implements OnInit {
   }
   
   onProveedorFilterChange(value: string): void {
-    if (value) {
-      this.vm.filtrarPorProveedor(Number(value));
-    } else {
-      this.vm.limpiarFiltros();
-    }
+    this.vm.filtrarPorProveedor(value ? Number(value) : null);
   }
 }

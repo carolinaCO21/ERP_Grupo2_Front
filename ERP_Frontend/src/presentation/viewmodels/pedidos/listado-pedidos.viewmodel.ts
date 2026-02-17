@@ -5,41 +5,39 @@ import { PedidoUIModel } from '../../models/pedido-ui.model';
 import { ProveedorDTO } from '../../../domain/dtos/proveedor.dto';
 import { EstadoPedido } from '../../../domain/enums/estado-pedido.enum';
 import { GetPedidosUseCase } from '../../../domain/usecases/pedidos/get-pedidos.usecase';
-import { GetPedidosByProveedorUseCase } from '../../../domain/usecases/pedidos/get-pedidos-by-proveedor.usecase';
 import { GetPedidosByEstadoUseCase } from '../../../domain/usecases/pedidos/get-pedidos-by-estado.usecase';
+import { GetPedidosByProveedorUseCase } from '../../../domain/usecases/pedidos/get-pedidos-by-proveedor.usecase';
 import { DeletePedidoUseCase } from '../../../domain/usecases/pedidos/delete-pedido.usecase';
 import { GetProveedoresUseCase } from '../../../domain/usecases/proveedores/get-proveedores.usecase';
 
 @Injectable()
 export class ListadoPedidosViewModel {
   private getPedidosUseCase = inject(GetPedidosUseCase);
-  private getPedidosByProveedorUseCase = inject(GetPedidosByProveedorUseCase);
   private getPedidosByEstadoUseCase = inject(GetPedidosByEstadoUseCase);
+  private getPedidosByProveedorUseCase = inject(GetPedidosByProveedorUseCase);
   private deletePedidoUseCase = inject(DeletePedidoUseCase);
   private getProveedoresUseCase = inject(GetProveedoresUseCase);
   private router = inject(Router);
-  
-  // Signals
+
   pedidos = signal<PedidoUIModel[]>([]);
   proveedores = signal<ProveedorDTO[]>([]);
   isLoading = signal(false);
   errorMessage = signal('');
-  
-  // Filtros
+
   filtroEstado = signal<string>('');
   filtroProveedor = signal<number | null>(null);
-  
+
   async init(): Promise<void> {
     await Promise.all([
       this.cargarPedidos(),
       this.cargarProveedores()
     ]);
   }
-  
+
   async cargarPedidos(): Promise<void> {
     this.isLoading.set(true);
     this.errorMessage.set('');
-    
+
     try {
       const pedidosDTO = await this.getPedidosUseCase.execute();
       const pedidosUI = pedidosDTO.map(p => this.toUIModel(p));
@@ -50,7 +48,7 @@ export class ListadoPedidosViewModel {
       this.isLoading.set(false);
     }
   }
-  
+
   async cargarProveedores(): Promise<void> {
     try {
       const proveedores = await this.getProveedoresUseCase.execute();
@@ -59,7 +57,7 @@ export class ListadoPedidosViewModel {
       console.error('Error al cargar proveedores', error);
     }
   }
-  
+
   async filtrarPorEstado(estado: string): Promise<void> {
     this.filtroEstado.set(estado);
 
@@ -69,7 +67,6 @@ export class ListadoPedidosViewModel {
     }
 
     this.isLoading.set(true);
-
     try {
       const pedidosDTO = await this.getPedidosByEstadoUseCase.execute(estado);
       const pedidosUI = pedidosDTO.map(p => this.toUIModel(p));
@@ -80,11 +77,16 @@ export class ListadoPedidosViewModel {
       this.isLoading.set(false);
     }
   }
-  
-  async filtrarPorProveedor(idProveedor: number): Promise<void> {
+
+  async filtrarPorProveedor(idProveedor: number | null): Promise<void> {
     this.filtroProveedor.set(idProveedor);
+
+    if (!idProveedor) {
+      await this.cargarPedidos();
+      return;
+    }
+
     this.isLoading.set(true);
-    
     try {
       const pedidosDTO = await this.getPedidosByProveedorUseCase.execute(idProveedor);
       const pedidosUI = pedidosDTO.map(p => this.toUIModel(p));
@@ -95,7 +97,7 @@ export class ListadoPedidosViewModel {
       this.isLoading.set(false);
     }
   }
-  
+
   async limpiarFiltros(): Promise<void> {
     this.filtroEstado.set('');
     this.filtroProveedor.set(null);
