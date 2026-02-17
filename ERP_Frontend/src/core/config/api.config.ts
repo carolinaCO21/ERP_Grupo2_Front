@@ -1,6 +1,7 @@
 export const API_CONFIG = {
-  baseUrl: 'https://tu-api.azurewebsites.net/api',          // Cambiar URL 
+  baseUrl: 'https://erp-grupo2-c0asb4fdhyftfcfj.francecentral-01.azurewebsites.net/api',
   endpoints: {
+    auth: '/auth',
     pedidos: '/pedidos',
     proveedores: '/proveedores',
     productos: '/productos'

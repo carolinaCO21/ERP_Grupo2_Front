@@ -1,7 +1,9 @@
 import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { BaseApiService } from '../api/base-api.service';
-import { FirebaseAuthService } from '../../core/services/firebase-auth.service';
 import { UsuarioDTO } from '../../domain/dtos/usuario.dto';
+import { API_CONFIG } from '../../core/config/api.config';
+import { lastValueFrom } from 'rxjs';
 
 /**
  * Repositorio para la gestión de usuarios y autenticación
@@ -11,7 +13,7 @@ import { UsuarioDTO } from '../../domain/dtos/usuario.dto';
   providedIn: 'root'
 })
 export class UsuarioRepository {
-  private firebaseAuth = inject(FirebaseAuthService);
+  private http = inject(HttpClient);
   private api = inject(BaseApiService);
 
   /**
@@ -27,26 +29,36 @@ export class UsuarioRepository {
    */
   async login(email: string, password: string): Promise<UsuarioDTO> {
     try {
-      // 1. Autentica con Firebase
-      const userCredential = await this.firebaseAuth.signIn(email, password);
-      
-      // 2. Obtiene el token de Firebase
-      const token = await userCredential.user.getIdToken();
+      // Llamar al endpoint del backend: POST /api/auth/login
+      const url = `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.auth}/login`;
+      const resp = await lastValueFrom(this.http.post<any>(url, { Email: email, Password: password }));
+      console.debug('Auth login response raw:', resp);
+
+      // Resp expected: { Token, RefreshToken, ExpiresIn, User }
+      const token = resp?.Token || resp?.token || '';
+      const user = resp?.User || resp?.user || null;
+
+      if (!token || !user) {
+        // limpieza por si acaso
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('currentUser');
+        throw new Error('Credenciales inválidas o respuesta inesperada del servidor');
+      }
+
       localStorage.setItem('authToken', token);
-      
-      // 3. Busca el usuario en la BD por email
-      // Nota: Este endpoint debe existir en el backend
-      const response = await this.api.get<UsuarioDTO>(`/usuarios/email/${email}`);
-      
-      // 4. Guarda datos del usuario en localStorage
-      localStorage.setItem('currentUser', JSON.stringify(response.data));
-      
-      return response.data;
+      localStorage.setItem('currentUser', JSON.stringify(user));
+
+      return user as UsuarioDTO;
     } catch (error: any) {
+      // Loguear detalles del error para diagnosticar 500
+      console.error('Login error:', error);
+      if (error?.error) console.error('Error body:', error.error);
       // Limpia datos en caso de error
       localStorage.removeItem('authToken');
       localStorage.removeItem('currentUser');
-      throw new Error(error.message || 'Error en el proceso de autenticación');
+      // Reenviar mensaje más informativo si existe
+      const serverMessage = error?.error?.message || error?.message;
+      throw new Error(serverMessage || 'Error en el proceso de autenticación');
     }
   }
 
@@ -55,7 +67,7 @@ export class UsuarioRepository {
    * Limpia Firebase Auth y localStorage
    */
   async logout(): Promise<void> {
-    await this.firebaseAuth.signOut();
+    // Solo limpiar localStorage; el backend no requiere endpoint adicional para logout
     localStorage.removeItem('authToken');
     localStorage.removeItem('currentUser');
   }
@@ -69,6 +81,17 @@ export class UsuarioRepository {
   async getUsuarioPorId(id: number): Promise<UsuarioDTO> {
     const response = await this.api.get<UsuarioDTO>(`/usuarios/${id}`);
     return response.data;
+  }
+
+  /**
+   * Obtiene la información del usuario autenticado usando el endpoint del backend
+   * GET /api/auth/me
+   */
+  async getMe(): Promise<UsuarioDTO> {
+    const url = `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.auth}/me`;
+    const resp = await lastValueFrom(this.http.get<any>(url));
+    // resp expected: AuthResponse (user info)
+    return resp as UsuarioDTO;
   }
 
   /**
