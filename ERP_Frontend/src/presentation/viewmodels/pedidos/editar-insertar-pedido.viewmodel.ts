@@ -102,19 +102,16 @@ export class EditarInsertarPedidoViewModel {
   }
   
   eliminarLinea(index: number): void {
-    this.lineasPedido.update(lineas => 
-      lineas.filter((_, i) => i !== index)
-    );
+    this.lineasPedido.update(lineas => lineas.filter((_, i) => i !== index));
   }
 
   actualizarLinea(index: number, campo: keyof LineaPedidoCreateDTO, valor: any): void {
     this.lineasPedido.update(lineas => {
-      const nuevasLineas = lineas.map((linea, i) => {
+      return lineas.map((linea, i) => {
         if (i !== index) return linea;
         
         const lineaActualizada = { ...linea, [campo]: valor };
         
-        // Autocompletar precio siempre que se cambie el producto
         if (campo === 'idProducto' && valor) {
           const producto = this.productosDisponibles().find(p => p.idProducto === valor);
           if (producto) {
@@ -124,8 +121,6 @@ export class EditarInsertarPedidoViewModel {
         
         return lineaActualizada;
       });
-      
-      return nuevasLineas;
     });
   }
 
@@ -198,7 +193,7 @@ export class EditarInsertarPedidoViewModel {
       direccionEntrega: this.direccionEntrega(),
       lineasPedido: this.lineasPedido()
     };
-
+    console.log('Enviando pedido:', JSON.stringify(pedidoCreateDto, null, 2));
     await this.createPedidoUseCase.execute(pedidoCreateDto);
   }
   
@@ -223,10 +218,8 @@ export class EditarInsertarPedidoViewModel {
       this.direccionEntrega.set(pedido.direccionEntrega);
       this.estadoSeleccionado.set(pedido.estado as EstadoPedido);
       
-      // Cargar productos del proveedor
       await this.onProveedorChange(pedido.idProveedor);
       
-      // Mapear líneas del pedido
       const lineas: LineaPedidoCreateDTO[] = pedido.lineasPedido.map(l => ({
         idProducto: l.idProducto,
         cantidad: l.cantidad,
