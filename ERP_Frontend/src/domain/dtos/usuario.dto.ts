@@ -1,5 +1,6 @@
 export interface UsuarioDTO {
-  id: number;
+  userId: number;
+  username: string;
   email: string;
   nombre: string;
   apellidos: string;

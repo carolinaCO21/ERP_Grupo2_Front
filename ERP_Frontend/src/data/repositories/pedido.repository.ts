@@ -69,9 +69,19 @@ export class PedidoRepository {
    * @returns Detalle del pedido creado
    */
   async insertarPedido(pedidoCreateDto: PedidoCreateDTO): Promise<PedidoDetailDTO> {
+    const body = {
+      idProveedor: pedidoCreateDto.idProveedor,
+      direccionEntrega: pedidoCreateDto.direccionEntrega,
+      lineasPedido: pedidoCreateDto.lineasPedido.map(l => ({
+        idProducto: l.idProducto,
+        cantidad: l.cantidad,
+        precioUnitario: l.precioUnitario,
+        ivaPorcentaje: l.ivaPorcentaje
+      }))
+    };
     const response = await this.api.post<PedidoDetailDTO>(
       this.endpoint,
-      pedidoCreateDto
+      body
     );
     return response.data;
   }

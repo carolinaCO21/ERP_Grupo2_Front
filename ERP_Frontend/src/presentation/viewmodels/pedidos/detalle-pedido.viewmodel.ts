@@ -141,8 +141,9 @@ export class DetallePedidoViewModel {
     const pedido = this.pedido();
     if (!pedido) return;
 
+    const label = ESTADO_PEDIDO_LABEL[nuevoEstado] || nuevoEstado;
     const confirmacion = confirm(
-      `¿Está seguro de cambiar el estado a "${nuevoEstado}"?`
+      `¿Está seguro de cambiar el estado a "${label}"?`
     );
 
     if (!confirmacion) return;

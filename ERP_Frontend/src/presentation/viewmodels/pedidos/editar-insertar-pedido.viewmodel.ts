@@ -10,7 +10,6 @@ import { ProductoProveedorDTO } from '../../../domain/dtos/producto-proveedor.dt
 import { LineaPedidoCreateDTO } from '../../../domain/dtos/linea-pedido-create.dto';
 import { PedidoCreateDTO } from '../../../domain/dtos/pedido-create.dto';
 import { PedidoUpdateDTO } from '../../../domain/dtos/pedido-update.dto';
-import { UsuarioRepository } from '../../../data/repositories/usuario.repository';
 import { EstadoPedido } from '../../../domain/enums/estado-pedido.enum';
 
 @Injectable()
@@ -20,7 +19,6 @@ export class EditarInsertarPedidoViewModel {
   private getPedidoByIdUseCase = inject(GetPedidoByIdUseCase);
   private getProveedoresUseCase = inject(GetProveedoresUseCase);
   private getProductosPorProveedorUseCase = inject(GetProductosPorProveedorUseCase);
-  private usuarioRepository = inject(UsuarioRepository);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   
@@ -195,18 +193,12 @@ export class EditarInsertarPedidoViewModel {
   }
   
   private async crearPedido(): Promise<void> {
-    const usuario = this.usuarioRepository.getCurrentUser();
-    if (!usuario) {
-      throw new Error('No hay usuario autenticado');
-    }
-    
     const pedidoCreateDto: PedidoCreateDTO = {
       idProveedor: this.proveedorSeleccionado()!,
-      idUsuario: usuario.id,
       direccionEntrega: this.direccionEntrega(),
       lineasPedido: this.lineasPedido()
     };
-    
+
     await this.createPedidoUseCase.execute(pedidoCreateDto);
   }
   
