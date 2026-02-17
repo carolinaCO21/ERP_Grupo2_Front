@@ -108,27 +108,66 @@ export class EditarInsertarPedidoViewModel {
       lineas.filter((_, i) => i !== index)
     );
   }
-  
-  onLineaChange(index: number, linea: LineaPedidoCreateDTO): void {
+
+  actualizarLinea(index: number, campo: keyof LineaPedidoCreateDTO, valor: any): void {
     this.lineasPedido.update(lineas => {
-      const nuevasLineas = [...lineas];
-      nuevasLineas[index] = linea;
-      
-      // Autocompletar precio si se seleccionó un producto
-      if (linea.idProducto && linea.precioUnitario === 0) {
-        const producto = this.productosDisponibles().find(
-          p => p.idProducto === linea.idProducto
-        );
-        if (producto) {
-          nuevasLineas[index].precioUnitario = producto.precioUnitario;
+      const nuevasLineas = lineas.map((linea, i) => {
+        if (i !== index) return linea;
+        
+        const lineaActualizada = { ...linea, [campo]: valor };
+        
+        // Autocompletar precio siempre que se cambie el producto
+        if (campo === 'idProducto' && valor) {
+          const producto = this.productosDisponibles().find(p => p.idProducto === valor);
+          if (producto) {
+            lineaActualizada.precioUnitario = producto.precioUnitario;
+          }
         }
-      }
+        
+        return lineaActualizada;
+      });
       
       return nuevasLineas;
     });
   }
+
+  private validarFormulario(): string | null {
+    const direccion = this.direccionEntrega();
+    
+    if (!direccion || direccion.length < 5) {
+      return 'La dirección de entrega debe tener al menos 5 caracteres.';
+    }
+    
+    if (direccion.length > 500) {
+      return 'La dirección de entrega no puede superar los 500 caracteres.';
+    }
+    
+    if (!this.proveedorSeleccionado()) {
+      return 'Debe seleccionar un proveedor.';
+    }
+    
+    if (this.lineasPedido().length === 0) {
+      return 'Debe agregar al menos una línea de pedido.';
+    }
+
+    const lineasInvalidas = this.lineasPedido().some(linea => 
+      !linea.idProducto || linea.cantidad < 1 || linea.precioUnitario <= 0
+    );
+    
+    if (lineasInvalidas) {
+      return 'Todas las líneas deben tener producto, cantidad válida y precio.';
+    }
+    
+    return null;
+  }
   
   async guardarPedido(): Promise<void> {
+    const errorValidacion = this.validarFormulario();
+    if (errorValidacion) {
+      this.errorMessage.set(errorValidacion);
+      return;
+    }
+
     this.isLoading.set(true);
     this.errorMessage.set('');
     
@@ -141,7 +180,7 @@ export class EditarInsertarPedidoViewModel {
       
       await this.router.navigate(['/home/pedidos/listado']);
     } catch (error: any) {
-      this.errorMessage.set(error.message);
+      this.errorMessage.set(error.message || 'Error al guardar el pedido');
     } finally {
       this.isLoading.set(false);
     }

@@ -70,7 +70,6 @@ export class DetallePedidoViewModel {
   estadosDisponibles = computed(() => {
     const estadoActual = this.estado() as EstadoPedido;
     
-    // Lógica de transiciones de estado permitidas
     switch (estadoActual) {
       case EstadoPedido.PENDIENTE:
         return [EstadoPedido.APROBADO, EstadoPedido.CANCELADO];
@@ -110,12 +109,6 @@ export class DetallePedidoViewModel {
     const pedido = this.pedido();
     if (!pedido) return;
     
-    const confirmacion = confirm(
-      `¿Está seguro de cambiar el estado a "${nuevoEstado}"?`
-    );
-    
-    if (!confirmacion) return;
-    
     this.isCambiandoEstado.set(true);
     this.errorMessage.set('');
     
@@ -132,7 +125,6 @@ export class DetallePedidoViewModel {
         }))
       });
       
-      // Recargar el pedido para obtener el estado actualizado
       await this.cargarPedido(pedido.id);
     } catch (error: any) {
       this.errorMessage.set(error.message || 'Error al cambiar el estado');
@@ -153,9 +145,11 @@ export class DetallePedidoViewModel {
   }
   
   abrirModalCambioEstado(): void {
-    this.mostrarModalCambioEstado.set(true);
-    const estadoActual = this.estado() as EstadoPedido;
-    this.nuevoEstado.set(estadoActual);
+    const estados = this.estadosDisponibles();
+    if (estados.length > 0) {
+      this.nuevoEstado.set(estados[0]);
+      this.mostrarModalCambioEstado.set(true);
+    }
   }
   
   cerrarModalCambioEstado(): void {
@@ -163,12 +157,10 @@ export class DetallePedidoViewModel {
   }
   
   async confirmarCambioEstado(): Promise<void> {
-    const nuevoEstadoSeleccionado = this.nuevoEstado();
-    await this.cambiarEstado(nuevoEstadoSeleccionado);
+    await this.cambiarEstado(this.nuevoEstado());
     this.cerrarModalCambioEstado();
   }
   
-  // Métodos auxiliares para cálculos de líneas individuales
   calcularSubtotalLinea(cantidad: number, precioUnitario: number): number {
     return cantidad * precioUnitario;
   }

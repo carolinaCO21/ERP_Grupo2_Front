@@ -22,4 +22,8 @@ export class PedidoFormComponent {
   onCancelar(): void {
     this.cancelar.emit();
   }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
 }

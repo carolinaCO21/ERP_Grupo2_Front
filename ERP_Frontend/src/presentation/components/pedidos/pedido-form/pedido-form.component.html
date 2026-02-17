@@ -8,7 +8,7 @@
         <div class="form-group">
           <label>Proveedor *</label>
           <select
-            [(ngModel)]="vm.proveedorSeleccionado"
+            [ngModel]="vm.proveedorSeleccionado()"
             (ngModelChange)="vm.onProveedorChange($event)"
             name="proveedor"
             [disabled]="vm.modoEdicion()"
@@ -24,7 +24,8 @@
       <div class="form-group">
         <label>Dirección de Entrega *</label>
         <textarea
-          [(ngModel)]="vm.direccionEntrega"
+          [ngModel]="vm.direccionEntrega()"
+          (ngModelChange)="vm.direccionEntrega.set($event)"
           name="direccion"
           rows="3"
           placeholder="Ingrese la dirección completa..."
@@ -51,7 +52,7 @@
       </div>
 
       <div class="lineas-container" *ngIf="vm.lineasPedido().length > 0">
-        <div *ngFor="let linea of vm.lineasPedido(); let i = index" class="linea-item">
+        <div *ngFor="let linea of vm.lineasPedido(); let i = index; trackBy: trackByIndex" class="linea-item">
           <div class="linea-header">
             <span class="linea-numero">Línea {{ i + 1 }}</span>
             <button type="button" class="btn-remove" (click)="vm.eliminarLinea(i)">
@@ -63,10 +64,11 @@
             <div class="form-group">
               <label>Producto *</label>
               <select
-                [(ngModel)]="linea.idProducto"
-                (ngModelChange)="vm.onLineaChange(i, linea)"
+                [ngModel]="linea.idProducto"
+                (ngModelChange)="vm.actualizarLinea(i, 'idProducto', $event)"
                 [name]="'producto_' + i"
                 required>
+                <option [ngValue]="0">Seleccione un producto...</option>
                 <option *ngFor="let producto of vm.productosDisponibles()" [ngValue]="producto.idProducto">
                   {{ producto.nombreProducto }}
                 </option>
@@ -77,7 +79,8 @@
               <label>Cantidad *</label>
               <input
                 type="number"
-                [(ngModel)]="linea.cantidad"
+                [ngModel]="linea.cantidad"
+                (ngModelChange)="vm.actualizarLinea(i, 'cantidad', $event)"
                 [name]="'cantidad_' + i"
                 min="1"
                 required />
@@ -87,7 +90,8 @@
               <label>Precio Unitario *</label>
               <input
                 type="number"
-                [(ngModel)]="linea.precioUnitario"
+                [ngModel]="linea.precioUnitario"
+                (ngModelChange)="vm.actualizarLinea(i, 'precioUnitario', $event)"
                 [name]="'precio_' + i"
                 min="0"
                 step="0.01"
@@ -98,7 +102,8 @@
               <label>IVA % *</label>
               <input
                 type="number"
-                [(ngModel)]="linea.ivaPorcentaje"
+                [ngModel]="linea.ivaPorcentaje"
+                (ngModelChange)="vm.actualizarLinea(i, 'ivaPorcentaje', $event)"
                 [name]="'iva_' + i"
                 min="0"
                 max="100"

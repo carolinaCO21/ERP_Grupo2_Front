@@ -25,10 +25,16 @@
         </span>
       </div>
       <div class="header-actions">
-        <button class="btn-cambiar-estado" (click)="vm.abrirModalCambioEstado()">
+        <button 
+          *ngIf="vm.puedeEditarEstado()" 
+          class="btn-cambiar-estado" 
+          (click)="vm.abrirModalCambioEstado()">
           🔄 Cambiar Estado
         </button>
-        <button class="btn-editar" (click)="vm.editar()">
+        <button 
+          *ngIf="vm.puedeEditarEstado()" 
+          class="btn-editar" 
+          (click)="vm.editar()">
           ✏️ Editar Pedido
         </button>
       </div>
@@ -150,8 +156,8 @@
         <button class="btn btn-cancel" (click)="vm.cerrarModalCambioEstado()">
           Cancelar
         </button>
-        <button class="btn btn-confirm" (click)="vm.confirmarCambioEstado()" [disabled]="vm.isLoading()">
-          {{ vm.isLoading() ? 'Guardando...' : 'Confirmar Cambio' }}
+        <button class="btn btn-confirm" (click)="vm.confirmarCambioEstado()" [disabled]="vm.isCambiandoEstado()">
+          {{ vm.isCambiandoEstado() ? 'Guardando...' : 'Confirmar Cambio' }}
         </button>
       </div>
     </div>
