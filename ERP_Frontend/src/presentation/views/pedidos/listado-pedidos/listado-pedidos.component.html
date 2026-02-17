@@ -15,12 +15,12 @@
         <label>Estado:</label>
         <select [value]="vm.filtroEstado()" (change)="vm.filtrarPorEstado($any($event.target).value)">
           <option value="">Todos</option>
-          <option value="PENDIENTE">Pendiente</option>
-          <option value="APROBADO">Aprobado</option>
-          <option value="EN_PROCESO">En Proceso</option>
-          <option value="ENVIADO">Enviado</option>
-          <option value="RECIBIDO">Recibido</option>
-          <option value="CANCELADO">Cancelado</option>
+          <option value="Pendiente">Pendiente</option>
+          <option value="Aprobado">Aprobado</option>
+          <option value="EnProceso">En Proceso</option>
+          <option value="Enviado">Enviado</option>
+          <option value="Recibido">Recibido</option>
+          <option value="Cancelado">Cancelado</option>
         </select>
       </div>
 

@@ -4,5 +4,5 @@ export interface PedidoUpdateDTO {
   id: number;
   estado: string;
   direccionEntrega: string;
-  lineasPedido: LineaPedidoCreateDTO[];
+  lineasPedido?: LineaPedidoCreateDTO[];
 }

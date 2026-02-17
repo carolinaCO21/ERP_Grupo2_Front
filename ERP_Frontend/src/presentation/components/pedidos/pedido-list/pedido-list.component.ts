@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PedidoUIModel } from '../../../models/pedido-ui.model';
+import { EstadoPedido, ESTADO_PEDIDO_LABEL } from '../../../../domain/enums/estado-pedido.enum';
 
 @Component({
   selector: 'app-pedido-list',
@@ -13,10 +14,18 @@ export class PedidoListComponent {
   @Input() pedidos: PedidoUIModel[] = [];
   @Input() isLoading: boolean = false;
   @Input() errorMessage: string = '';
-  
+
   @Output() eliminar = new EventEmitter<number>();
   @Output() verDetalle = new EventEmitter<number>();
   @Output() editar = new EventEmitter<number>();
+
+  esPendiente(pedido: PedidoUIModel): boolean {
+    return pedido.estado === EstadoPedido.PENDIENTE;
+  }
+
+  estadoLabel(estado: string): string {
+    return ESTADO_PEDIDO_LABEL[estado] || estado;
+  }
 
   onEliminar(id: number): void {
     this.eliminar.emit(id);

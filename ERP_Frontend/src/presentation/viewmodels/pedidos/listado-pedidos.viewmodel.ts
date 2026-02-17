@@ -97,15 +97,20 @@ export class ListadoPedidosViewModel {
   }
   
   async eliminarPedido(id: number): Promise<void> {
+    const pedido = this.pedidos().find(p => p.id === id);
+    if (pedido && pedido.estado !== EstadoPedido.PENDIENTE) {
+      alert('Solo se pueden eliminar pedidos en estado Pendiente.');
+      return;
+    }
+
     if (!confirm('¿Está seguro de eliminar este pedido?')) {
       return;
     }
-    
+
     try {
       await this.deletePedidoUseCase.execute(id);
       await this.cargarPedidos();
     } catch (error: any) {
-      // El UseCase lanza un error si no se puede eliminar (ej: pedido RECIBIDO)
       alert(error.message);
     }
   }

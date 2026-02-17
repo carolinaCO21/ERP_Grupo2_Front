@@ -25,7 +25,7 @@
         <div class="pedido-info">
           <h3 class="pedido-numero">{{ pedido.numeroPedido }}</h3>
           <span class="badge" [ngClass]="pedido.estadoBadgeClass">
-            {{ pedido.estado }}
+            {{ estadoLabel(pedido.estado) }}
           </span>
         </div>
       </div>
@@ -49,10 +49,10 @@
         <button class="btn btn-view" (click)="onVerDetalle(pedido.id)">
           <span>👁️</span> Ver
         </button>
-        <button class="btn btn-edit" (click)="onEditar(pedido.id)">
+        <button *ngIf="esPendiente(pedido)" class="btn btn-edit" (click)="onEditar(pedido.id)">
           <span>✏️</span> Editar
         </button>
-        <button class="btn btn-delete" (click)="onEliminar(pedido.id)">
+        <button *ngIf="esPendiente(pedido)" class="btn btn-delete" (click)="onEliminar(pedido.id)">
           <span>🗑️</span> Eliminar
         </button>
       </div>

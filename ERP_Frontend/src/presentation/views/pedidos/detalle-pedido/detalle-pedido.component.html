@@ -21,19 +21,32 @@
         </button>
         <h1>📦 Pedido {{ vm.numeroPedido() }}</h1>
         <span class="badge" [ngClass]="vm.estadoBadgeClass()">
-          {{ vm.estado() }}
+          {{ vm.estadoLabel() }}
         </span>
       </div>
       <div class="header-actions">
-        <button 
-          *ngIf="vm.puedeEditarEstado()" 
-          class="btn-cambiar-estado" 
-          (click)="vm.abrirModalCambioEstado()">
-          🔄 Cambiar Estado
+        <!-- Botón Avanzar Estado -->
+        <button
+          *ngIf="vm.siguienteEstado()"
+          class="btn-avanzar-estado"
+          (click)="vm.avanzarEstado()"
+          [disabled]="vm.isCambiandoEstado()">
+          {{ vm.isCambiandoEstado() ? 'Cambiando...' : '▶ Pasar a ' + vm.siguienteEstadoLabel() }}
         </button>
-        <button 
-          *ngIf="vm.puedeEditarEstado()" 
-          class="btn-editar" 
+
+        <!-- Botón Cancelar Pedido -->
+        <button
+          *ngIf="vm.puedeCancelar()"
+          class="btn-cancelar-pedido"
+          (click)="vm.cancelarPedido()"
+          [disabled]="vm.isCambiandoEstado()">
+          ✕ Cancelar Pedido
+        </button>
+
+        <!-- Botón Editar (solo si está Pendiente) -->
+        <button
+          *ngIf="vm.puedeEditar()"
+          class="btn-editar"
           (click)="vm.editar()">
           ✏️ Editar Pedido
         </button>
@@ -118,47 +131,6 @@
           <span class="resumen-label">TOTAL:</span>
           <span class="resumen-value">{{ vm.total() | currency:'EUR' }}</span>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Cambiar Estado -->
-  <div *ngIf="vm.mostrarModalCambioEstado()" class="modal-overlay" (click)="vm.cerrarModalCambioEstado()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>🔄 Cambiar Estado del Pedido</h2>
-        <button class="btn-close" (click)="vm.cerrarModalCambioEstado()">✕</button>
-      </div>
-      
-      <div class="modal-body">
-        <p class="modal-description">
-          Selecciona el nuevo estado para el pedido <strong>{{ vm.numeroPedido() }}</strong>
-        </p>
-        
-        <div class="estado-actual">
-          <span class="label">Estado actual:</span>
-          <span class="badge" [ngClass]="vm.estadoBadgeClass()">
-            {{ vm.estado() }}
-          </span>
-        </div>
-        
-        <div class="form-group">
-          <label>Nuevo Estado:</label>
-          <select [value]="vm.nuevoEstado()" (change)="vm.nuevoEstado.set($any($event.target).value)" class="select-estado">
-            <option *ngFor="let estado of vm.estadosDisponibles()" [value]="estado">
-              {{ estado }}
-            </option>
-          </select>
-        </div>
-      </div>
-      
-      <div class="modal-actions">
-        <button class="btn btn-cancel" (click)="vm.cerrarModalCambioEstado()">
-          Cancelar
-        </button>
-        <button class="btn btn-confirm" (click)="vm.confirmarCambioEstado()" [disabled]="vm.isCambiandoEstado()">
-          {{ vm.isCambiandoEstado() ? 'Guardando...' : 'Confirmar Cambio' }}
-        </button>
       </div>
     </div>
   </div>
