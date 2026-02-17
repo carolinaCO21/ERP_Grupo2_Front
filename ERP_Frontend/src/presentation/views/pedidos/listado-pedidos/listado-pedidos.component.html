@@ -1,46 +1,53 @@
-<div class="listado-pedidos-container">
+<div class="listado-page">
   <div class="page-header">
-    <div class="header-content">
-      <h1>📦 Listado de Pedidos</h1>
-      <button class="btn-nuevo" (click)="vm.nuevoPedido()">
-        ➕ Nuevo Pedido
-      </button>
+    <div>
+      <h1>Pedidos</h1>
+      <p class="page-desc">Gestion de pedidos a proveedores</p>
     </div>
+    <button class="btn-nuevo" (click)="vm.nuevoPedido()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h14"/>
+        <path d="M12 5v14"/>
+      </svg>
+      Nuevo Pedido
+    </button>
   </div>
 
-  <!-- Filtros -->
-  <div class="filters-section">
-    <div class="filters-content">
-      <div class="filter-group">
-        <label>Estado:</label>
-        <select [value]="vm.filtroEstado()" (change)="vm.filtrarPorEstado($any($event.target).value)">
-          <option value="">Todos</option>
-          <option value="Pendiente">Pendiente</option>
-          <option value="Aprobado">Aprobado</option>
-          <option value="EnProceso">En Proceso</option>
-          <option value="Enviado">Enviado</option>
-          <option value="Recibido">Recibido</option>
-          <option value="Cancelado">Cancelado</option>
-        </select>
-      </div>
-
-      <div class="filter-group">
-        <label>Proveedor:</label>
-        <select (change)="onProveedorFilterChange($any($event.target).value)">
-          <option value="">Todos</option>
-          <option *ngFor="let proveedor of vm.proveedores()" [value]="proveedor.id">
-            {{ proveedor.nombreEmpresa }}
-          </option>
-        </select>
-      </div>
-
-      <button class="btn-limpiar" (click)="vm.limpiarFiltros()">
-        🔄 Limpiar Filtros
-      </button>
+  <div class="filters-bar">
+    <div class="filter-group">
+      <label>Estado</label>
+      <select [value]="vm.filtroEstado()" (change)="vm.filtrarPorEstado($any($event.target).value)">
+        <option value="">Todos</option>
+        <option value="Pendiente">Pendiente</option>
+        <option value="Aprobado">Aprobado</option>
+        <option value="EnProceso">En Proceso</option>
+        <option value="Enviado">Enviado</option>
+        <option value="Recibido">Recibido</option>
+        <option value="Cancelado">Cancelado</option>
+      </select>
     </div>
+
+    <div class="filter-group">
+      <label>Proveedor</label>
+      <select (change)="onProveedorFilterChange($any($event.target).value)">
+        <option value="">Todos</option>
+        <option *ngFor="let proveedor of vm.proveedores()" [value]="proveedor.id">
+          {{ proveedor.nombreEmpresa }}
+        </option>
+      </select>
+    </div>
+
+    <button class="btn-limpiar" (click)="vm.limpiarFiltros()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+        <path d="M21 3v5h-5"/>
+        <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+        <path d="M8 16H3v5"/>
+      </svg>
+      Limpiar
+    </button>
   </div>
 
-  <!-- Lista de Pedidos -->
   <app-pedido-list
     [pedidos]="vm.pedidos()"
     [isLoading]="vm.isLoading()"

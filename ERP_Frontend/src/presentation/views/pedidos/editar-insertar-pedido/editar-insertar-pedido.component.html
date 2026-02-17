@@ -1,7 +1,7 @@
-<div class="editar-insertar-pedido-container">
+<div class="edit-page">
   <div class="page-header">
-    <h1>{{ vm.modoEdicion() ? '✏️ Editar Pedido' : '➕ Nuevo Pedido' }}</h1>
-    <p class="subtitle">{{ vm.modoEdicion() ? 'Modifica los datos del pedido' : 'Crea un nuevo pedido a proveedor' }}</p>
+    <h1>{{ vm.modoEdicion() ? 'Editar Pedido' : 'Nuevo Pedido' }}</h1>
+    <p class="page-desc">{{ vm.modoEdicion() ? 'Modifica los datos del pedido' : 'Crea un nuevo pedido a proveedor' }}</p>
   </div>
 
   <app-pedido-form

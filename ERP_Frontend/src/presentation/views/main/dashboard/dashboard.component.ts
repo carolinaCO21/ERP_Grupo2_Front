@@ -11,16 +11,16 @@ import { RouterModule } from '@angular/router';
 })
 export class DashboardComponent {
   stats = [
-    { icon: '📦', label: 'Pedidos Activos', value: '24', color: '#667eea' },
-    { icon: '✅', label: 'Pedidos Completados', value: '156', color: '#48bb78' },
-    { icon: '⏳', label: 'Pedidos Pendientes', value: '8', color: '#f59e0b' },
-    { icon: '💰', label: 'Total Facturado', value: '45.230 €', color: '#8b5cf6' },
+    { label: 'Pedidos Activos', value: '24', change: '+3 esta semana', icon: 'orders', gradient: 'gradient-indigo' },
+    { label: 'Completados', value: '156', change: '+12 este mes', icon: 'check', gradient: 'gradient-emerald' },
+    { label: 'Pendientes', value: '8', change: '2 urgentes', icon: 'clock', gradient: 'gradient-amber' },
+    { label: 'Total Facturado', value: '45.230 \u20ac', change: '+8% vs anterior', icon: 'euro', gradient: 'gradient-violet' },
   ];
 
   quickActions = [
-    { icon: '➕', label: 'Nuevo Pedido', route: '/home/pedidos/nuevo', color: '#667eea' },
-    { icon: '📋', label: 'Ver Pedidos', route: '/home/pedidos/listado', color: '#48bb78' },
- { icon: '🏭', label: 'Proveedores', route: '/home/proveedores', color: '#f59e0b' },
-{ icon: '📊', label: 'Informes', route: '/home/reportes', color: '#8b5cf6' },
+    { label: 'Nuevo Pedido', route: '/home/pedidos/nuevo', icon: 'plus' },
+    { label: 'Ver Pedidos', route: '/home/pedidos/listado', icon: 'list' },
+    { label: 'Proveedores', route: '/home/proveedores', icon: 'users' },
+    { label: 'Informes', route: '/home/reportes', icon: 'chart' },
   ];
 }
