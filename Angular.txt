@@ -1,0 +1,1611 @@
+================================================================================
+            ESTRUCTURA CLEAN ARCHITECTURE - FRONTEND ANGULAR 
+                    ERP PEDIDOS A PROVEEDORES
+         (Con Inyección de Dependencias Nativa y async/await)
+================================================================================
+
+src/
+├── core/
+│   ├── config/
+│   │   └── api.config.ts
+│   │       
+│   │       export const API_CONFIG = {
+│   │         baseUrl: 'https://tu-api.azurewebsites.net/api',
+│   │         endpoints: {
+│   │           pedidos: '/pedidos',
+│   │           proveedores: '/proveedores',
+│   │           productos: '/productos'
+│   │         }
+│   │       };
+│   │
+│   ├── guards/
+│   │   └── auth.guard.ts
+│   │       
+│   │       import { inject } from '@angular/core';
+│   │       import { Router, CanActivateFn } from '@angular/router';
+│   │       
+│   │       export const authGuard: CanActivateFn = (route, state) => {
+│   │         const router = inject(Router);
+│   │         const token = localStorage.getItem('authToken');
+│   │         
+│   │         if (token) {
+│   │           return true;
+│   │         }
+│   │         
+│   │         router.navigate(['/login']);
+│   │         return false;
+│   │       };
+│   │
+│   ├── interceptors/
+│   │   ├── auth.interceptor.ts
+│   │   │   
+│   │   │   import { HttpInterceptorFn } from '@angular/common/http';
+│   │   │   
+│   │   │   export const authInterceptor: HttpInterceptorFn = (req, next) => {
+│   │   │     const token = localStorage.getItem('authToken');
+│   │   │     
+│   │   │     if (token) {
+│   │   │       const clonedRequest = req.clone({
+│   │   │         setHeaders: {
+│   │   │           Authorization: `Bearer ${token}`
+│   │   │         }
+│   │   │       });
+│   │   │       return next(clonedRequest);
+│   │   │     }
+│   │   │     
+│   │   │     return next(req);
+│   │   │   };
+│   │   │
+│   │   └── error.interceptor.ts
+│   │       
+│   │       import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+│   │       import { catchError, throwError } from 'rxjs';
+│   │       
+│   │       export const errorInterceptor: HttpInterceptorFn = (req, next) => {
+│   │         return next(req).pipe(
+│   │           catchError((error: HttpErrorResponse) => {
+│   │             let errorMessage = 'Ha ocurrido un error';
+│   │             
+│   │             if (error.error instanceof ErrorEvent) {
+│   │               errorMessage = `Error: ${error.error.message}`;
+│   │             } else {
+│   │               errorMessage = `Código: ${error.status}\nMensaje: ${error.message}`;
+│   │             }
+│   │             
+│   │             console.error(errorMessage);
+│   │             return throwError(() => new Error(errorMessage));
+│   │           })
+│   │         );
+│   │       };
+│   │
+│   └── services/
+│       └── firebase-auth.service.ts
+│           
+│           import { Injectable } from '@angular/core';
+│           import { Auth, signInWithEmailAndPassword, signOut, 
+│                    User, UserCredential } from '@angular/fire/auth';
+│           
+│           @Injectable({
+│             providedIn: 'root'
+│           })
+│           export class FirebaseAuthService {
+│             constructor(private auth: Auth) {}
+│             
+│             async signIn(email: string, password: string): Promise<UserCredential> {
+│               return await signInWithEmailAndPassword(this.auth, email, password);
+│             }
+│             
+│             async signOut(): Promise<void> {
+│               await signOut(this.auth);
+│             }
+│             
+│             getCurrentUser(): User | null {
+│               return this.auth.currentUser;
+│             }
+│             
+│             async getIdToken(): Promise<string> {
+│               const user = this.getCurrentUser();
+│               if (!user) throw new Error('No hay usuario autenticado');
+│               return await user.getIdToken();
+│             }
+│           }
+│
+│
+├── data/
+│   ├── api/
+│   │   └── base-api.service.ts
+│   │       
+│   │       import { Injectable, inject } from '@angular/core';
+│   │       import { HttpClient } from '@angular/common/http';
+│   │       import { lastValueFrom } from 'rxjs';
+│   │       import { API_CONFIG } from '../../core/config/api.config';
+│   │       import { ApiResponseDTO } from '../../domain/dtos/api-response.dto';
+│   │       
+│   │       @Injectable({
+│   │         providedIn: 'root'
+│   │       })
+│   │       export class BaseApiService {
+│   │         private http = inject(HttpClient);
+│   │         private baseUrl = API_CONFIG.baseUrl;
+│   │         
+│   │         async get<T>(endpoint: string): Promise<ApiResponseDTO<T>> {
+│   │           const url = `${this.baseUrl}${endpoint}`;
+│   │           return await lastValueFrom(this.http.get<ApiResponseDTO<T>>(url));
+│   │         }
+│   │         
+│   │         async post<T>(endpoint: string, body: any): Promise<ApiResponseDTO<T>> {
+│   │           const url = `${this.baseUrl}${endpoint}`;
+│   │           return await lastValueFrom(
+│   │             this.http.post<ApiResponseDTO<T>>(url, body)
+│   │           );
+│   │         }
+│   │         
+│   │         async put<T>(endpoint: string, body: any): Promise<ApiResponseDTO<T>> {
+│   │           const url = `${this.baseUrl}${endpoint}`;
+│   │           return await lastValueFrom(
+│   │             this.http.put<ApiResponseDTO<T>>(url, body)
+│   │           );
+│   │         }
+│   │         
+│   │         async delete<T>(endpoint: string): Promise<ApiResponseDTO<T>> {
+│   │           const url = `${this.baseUrl}${endpoint}`;
+│   │           return await lastValueFrom(
+│   │             this.http.delete<ApiResponseDTO<T>>(url)
+│   │           );
+│   │         }
+│   │       }
+│   │
+│   └── repositories/
+│       ├── usuario.repository.ts
+│       │   
+│       │   import { Injectable, inject } from '@angular/core';
+│       │   import { UsuarioDTO } from '../../domain/dtos/usuario.dto';
+│       │   import { FirebaseAuthService } from '../../core/services/firebase-auth.service';
+│       │   import { BaseApiService } from '../api/base-api.service';
+│       │   
+│       │   @Injectable({
+│       │     providedIn: 'root'
+│       │   })
+│       │   export class UsuarioRepository {
+│       │     private firebaseAuth = inject(FirebaseAuthService);
+│       │     private api = inject(BaseApiService);
+│       │     
+│       │     async login(email: string, password: string): Promise<UsuarioDTO> {
+│       │       // 1. Autentica con Firebase
+│       │       const userCredential = await this.firebaseAuth.signIn(email, password);
+│       │       
+│       │       // 2. Obtiene el token
+│       │       const token = await userCredential.user.getIdToken();
+│       │       localStorage.setItem('authToken', token);
+│       │       
+│       │       // 3. Busca el usuario en la BD por email
+│       │       const response = await this.api.get<UsuarioDTO>(`/usuarios/email/${email}`);
+│       │       
+│       │       // 4. Guarda datos del usuario
+│       │       localStorage.setItem('currentUser', JSON.stringify(response.data));
+│       │       
+│       │       return response.data;
+│       │     }
+│       │     
+│       │     async logout(): Promise<void> {
+│       │       await this.firebaseAuth.signOut();
+│       │       localStorage.removeItem('authToken');
+│       │       localStorage.removeItem('currentUser');
+│       │     }
+│       │     
+│       │     async getUsuarioPorId(id: number): Promise<UsuarioDTO> {
+│       │       const response = await this.api.get<UsuarioDTO>(`/usuarios/${id}`);
+│       │       return response.data;
+│       │     }
+│       │     
+│       │     getCurrentUser(): UsuarioDTO | null {
+│       │       const userStr = localStorage.getItem('currentUser');
+│       │       return userStr ? JSON.parse(userStr) : null;
+│       │     }
+│       │   }
+│       │
+│       ├── proveedor.repository.ts
+│       │   
+│       │   import { Injectable, inject } from '@angular/core';
+│       │   import { ProveedorDTO } from '../../domain/dtos/proveedor.dto';
+│       │   import { ProductoProveedorDTO } from '../../domain/dtos/producto-proveedor.dto';
+│       │   import { BaseApiService } from '../api/base-api.service';
+│       │   import { Proveedor } from '../../domain/entities/proveedor.entity';
+│       │   
+│       │   @Injectable({
+│       │     providedIn: 'root'
+│       │   })
+│       │   export class ProveedorRepository {
+│       │     private api = inject(BaseApiService);
+│       │     
+│       │     async getListadoProveedores(): Promise<ProveedorDTO[]> {
+│       │       const response = await this.api.get<ProveedorDTO[]>('/proveedores');
+│       │       return response.data;
+│       │     }
+│       │     
+│       │     async getProveedorPorId(id: number): Promise<ProveedorDTO> {
+│       │       const response = await this.api.get<ProveedorDTO>(`/proveedores/${id}`);
+│       │       return response.data;
+│       │     }
+│       │     
+│       │     async getProductosPorProveedor(id: number): Promise<ProductoProveedorDTO[]> {
+│       │       const response = await this.api.get<ProductoProveedorDTO[]>(
+│       │         `/proveedores/${id}/productos`
+│       │       );
+│       │       return response.data;
+│       │     }
+│       │     
+│       │     async insertarProveedor(proveedor: Proveedor): Promise<number> {
+│       │       const response = await this.api.post<number>('/proveedores', proveedor);
+│       │       return response.data;
+│       │     }
+│       │     
+│       │     async editarProveedor(proveedor: Proveedor): Promise<number> {
+│       │       const response = await this.api.put<number>('/proveedores', proveedor);
+│       │       return response.data;
+│       │     }
+│       │     
+│       │     async eliminarProveedor(id: number): Promise<number> {
+│       │       const response = await this.api.delete<number>(`/proveedores/${id}`);
+│       │       return response.data;
+│       │     }
+│       │   }
+│       │
+│       ├── producto.repository.ts
+│       │   
+│       │   import { Injectable, inject } from '@angular/core';
+│       │   import { ProductoDTO } from '../../domain/dtos/producto.dto';
+│       │   import { BaseApiService } from '../api/base-api.service';
+│       │   import { Producto } from '../../domain/entities/producto.entity';
+│       │   
+│       │   @Injectable({
+│       │     providedIn: 'root'
+│       │   })
+│       │   export class ProductoRepository {
+│       │     private api = inject(BaseApiService);
+│       │     
+│       │     async getListadoProductos(): Promise<ProductoDTO[]> {
+│       │       const response = await this.api.get<ProductoDTO[]>('/productos');
+│       │       return response.data;
+│       │     }
+│       │     
+│       │     async getProductoPorId(id: number): Promise<ProductoDTO> {
+│       │       const response = await this.api.get<ProductoDTO>(`/productos/${id}`);
+│       │       return response.data;
+│       │     }
+│       │     
+│       │     async insertarProducto(producto: Producto): Promise<number> {
+│       │       const response = await this.api.post<number>('/productos', producto);
+│       │       return response.data;
+│       │     }
+│       │     
+│       │     async editarProducto(producto: Producto): Promise<number> {
+│       │       const response = await this.api.put<number>('/productos', producto);
+│       │       return response.data;
+│       │     }
+│       │     
+│       │     async eliminarProducto(id: number): Promise<number> {
+│       │       const response = await this.api.delete<number>(`/productos/${id}`);
+│       │       return response.data;
+│       │     }
+│       │   }
+│       │
+│       └── pedido.repository.ts
+│           
+│           import { Injectable, inject } from '@angular/core';
+│           import { PedidoListDTO } from '../../domain/dtos/pedido-list.dto';
+│           import { PedidoDetailDTO } from '../../domain/dtos/pedido-detail.dto';
+│           import { PedidoCreateDTO } from '../../domain/dtos/pedido-create.dto';
+│           import { PedidoUpdateDTO } from '../../domain/dtos/pedido-update.dto';
+│           import { BaseApiService } from '../api/base-api.service';
+│           
+│           @Injectable({
+│             providedIn: 'root'
+│           })
+│           export class PedidoRepository {
+│             private api = inject(BaseApiService);
+│             
+│             async getListadoPedidos(): Promise<PedidoListDTO[]> {
+│               const response = await this.api.get<PedidoListDTO[]>('/pedidos');
+│               return response.data;
+│             }
+│             
+│             async getPedidoPorId(id: number): Promise<PedidoDetailDTO> {
+│               const response = await this.api.get<PedidoDetailDTO>(`/pedidos/${id}`);
+│               return response.data;
+│             }
+│             
+│             async getPedidosPorProveedor(idProveedor: number): Promise<PedidoListDTO[]> {
+│               const response = await this.api.get<PedidoListDTO[]>(
+│                 `/pedidos/proveedor/${idProveedor}`
+│               );
+│               return response.data;
+│             }
+│             
+│             async getPedidosPorEstado(estado: string): Promise<PedidoListDTO[]> {
+│               const response = await this.api.get<PedidoListDTO[]>(
+│                 `/pedidos/estado/${estado}`
+│               );
+│               return response.data;
+│             }
+│             
+│             async insertarPedido(pedidoCreateDto: PedidoCreateDTO): Promise<PedidoDetailDTO> {
+│               const response = await this.api.post<PedidoDetailDTO>(
+│                 '/pedidos',
+│                 pedidoCreateDto
+│               );
+│               return response.data;
+│             }
+│             
+│             async editarPedido(pedidoUpdateDto: PedidoUpdateDTO): Promise<PedidoDetailDTO> {
+│               const response = await this.api.put<PedidoDetailDTO>(
+│                 '/pedidos',
+│                 pedidoUpdateDto
+│               );
+│               return response.data;
+│             }
+│             
+│             async eliminarPedido(id: number): Promise<boolean> {
+│               const response = await this.api.delete<boolean>(`/pedidos/${id}`);
+│               return response.data;
+│             }
+│           }
+│
+│
+├── domain/
+│   ├── entities/
+│   │   ├── usuario.entity.ts
+│   │   │   
+│   │   │   export class Usuario {
+│   │   │     constructor(
+│   │   │       public id: number,
+│   │   │       public firebaseUid: string,
+│   │   │       public email: string,
+│   │   │       public nombre: string,
+│   │   │       public apellidos: string,
+│   │   │       public rol: string,
+│   │   │       public activo: boolean
+│   │   │     ) {}
+│   │   │   }
+│   │   │
+│   │   ├── proveedor.entity.ts
+│   │   │   
+│   │   │   export class Proveedor {
+│   │   │     constructor(
+│   │   │       public id: number,
+│   │   │       public nombreEmpresa: string,
+│   │   │       public cif: string,
+│   │   │       public direccion: string,
+│   │   │       public ciudad: string,
+│   │   │       public provincia: string,
+│   │   │       public codigoPostal: string,
+│   │   │       public telefono: string,
+│   │   │       public email: string,
+│   │   │       public activo: boolean
+│   │   │     ) {}
+│   │   │   }
+│   │   │
+│   │   ├── producto.entity.ts
+│   │   │   
+│   │   │   export class Producto {
+│   │   │     constructor(
+│   │   │       public id: number,
+│   │   │       public codigoProducto: string,
+│   │   │       public nombre: string,
+│   │   │       public descripcion: string,
+│   │   │       public categoria: string,
+│   │   │       public unidadMedida: string,
+│   │   │       public precio: number,
+│   │   │       public stockActual: number,
+│   │   │       public activo: boolean
+│   │   │     ) {}
+│   │   │   }
+│   │   │
+│   │   ├── pedido.entity.ts
+│   │   │   
+│   │   │   export class Pedido {
+│   │   │     constructor(
+│   │   │       public id: number,
+│   │   │       public numeroPedido: string,
+│   │   │       public idProveedor: number,
+│   │   │       public idUsuario: number,
+│   │   │       public fechaPedido: Date,
+│   │   │       public estado: string,
+│   │   │       public subtotal: number,
+│   │   │       public impuestos: number,
+│   │   │       public total: number,
+│   │   │       public direccionEntrega: string
+│   │   │     ) {}
+│   │   │   }
+│   │   │
+│   │   ├── linea-pedido.entity.ts
+│   │   │   
+│   │   │   export class LineaPedido {
+│   │   │     constructor(
+│   │   │       public id: number,
+│   │   │       public idPedido: number,
+│   │   │       public idProducto: number,
+│   │   │       public cantidad: number,
+│   │   │       public precioUnitario: number,
+│   │   │       public subtotal: number,
+│   │   │       public ivaPorcentaje: number,
+│   │   │       public totalLinea: number
+│   │   │     ) {}
+│   │   │   }
+│   │   │
+│   │   └── producto-proveedor.entity.ts
+│   │       
+│   │       export class ProductoProveedor {
+│   │         constructor(
+│   │           public id: number,
+│   │           public idProveedor: number,
+│   │           public idProducto: number,
+│   │           public precioUnitario: number,
+│   │           public activo: boolean
+│   │         ) {}
+│   │       }
+│   │
+│   ├── dtos/
+│   │   ├── usuario.dto.ts
+│   │   │   
+│   │   │   export interface UsuarioDTO {
+│   │   │     id: number;
+│   │   │     email: string;
+│   │   │     nombre: string;
+│   │   │     apellidos: string;
+│   │   │     rol: string;
+│   │   │     activo: boolean;
+│   │   │   }
+│   │   │
+│   │   ├── proveedor.dto.ts
+│   │   │   
+│   │   │   export interface ProveedorDTO {
+│   │   │     id: number;
+│   │   │     nombreEmpresa: string;
+│   │   │     cif: string;
+│   │   │     telefono: string;
+│   │   │     email: string;
+│   │   │     activo: boolean;
+│   │   │   }
+│   │   │
+│   │   ├── producto.dto.ts
+│   │   │   
+│   │   │   export interface ProductoDTO {
+│   │   │     id: number;
+│   │   │     codigoProducto: string;
+│   │   │     nombre: string;
+│   │   │     categoria: string;
+│   │   │     unidadMedida: string;
+│   │   │     precio: number;
+│   │   │     stockActual: number;
+│   │   │   }
+│   │   │
+│   │   ├── producto-proveedor.dto.ts
+│   │   │   
+│   │   │   export interface ProductoProveedorDTO {
+│   │   │     idProducto: number;
+│   │   │     codigoProducto: string;
+│   │   │     nombreProducto: string;
+│   │   │     precioUnitario: number;
+│   │   │   }
+│   │   │
+│   │   ├── pedido-list.dto.ts
+│   │   │   
+│   │   │   export interface PedidoListDTO {
+│   │   │     id: number;
+│   │   │     numeroPedido: string;
+│   │   │     nombreProveedor: string;
+│   │   │     fechaPedido: Date;
+│   │   │     estado: string;
+│   │   │     total: number;
+│   │   │   }
+│   │   │
+│   │   ├── pedido-detail.dto.ts
+│   │   │   
+│   │   │   import { LineaPedidoDTO } from './linea-pedido.dto';
+│   │   │   
+│   │   │   export interface PedidoDetailDTO {
+│   │   │     id: number;
+│   │   │     numeroPedido: string;
+│   │   │     idProveedor: number;
+│   │   │     nombreProveedor: string;
+│   │   │     idUsuario: number;
+│   │   │     nombreUsuario: string;
+│   │   │     fechaPedido: Date;
+│   │   │     estado: string;
+│   │   │     subtotal: number;
+│   │   │     impuestos: number;
+│   │   │     total: number;
+│   │   │     direccionEntrega: string;
+│   │   │     lineasPedido: LineaPedidoDTO[];
+│   │   │   }
+│   │   │
+│   │   ├── linea-pedido.dto.ts
+│   │   │   
+│   │   │   export interface LineaPedidoDTO {
+│   │   │     id: number;
+│   │   │     idProducto: number;
+│   │   │     nombreProducto: string;
+│   │   │     codigoProducto: string;
+│   │   │     cantidad: number;
+│   │   │     precioUnitario: number;
+│   │   │     subtotal: number;
+│   │   │     ivaPorcentaje: number;
+│   │   │     totalLinea: number;
+│   │   │   }
+│   │   │
+│   │   ├── pedido-create.dto.ts
+│   │   │   
+│   │   │   import { LineaPedidoCreateDTO } from './linea-pedido-create.dto';
+│   │   │   
+│   │   │   export interface PedidoCreateDTO {
+│   │   │     idProveedor: number;
+│   │   │     idUsuario: number;
+│   │   │     direccionEntrega: string;
+│   │   │     lineasPedido: LineaPedidoCreateDTO[];
+│   │   │   }
+│   │   │
+│   │   ├── linea-pedido-create.dto.ts
+│   │   │   
+│   │   │   export interface LineaPedidoCreateDTO {
+│   │   │     idProducto: number;
+│   │   │     cantidad: number;
+│   │   │     precioUnitario: number;
+│   │   │     ivaPorcentaje: number;
+│   │   │   }
+│   │   │
+│   │   ├── pedido-update.dto.ts
+│   │   │   
+│   │   │   import { LineaPedidoCreateDTO } from './linea-pedido-create.dto';
+│   │   │   
+│   │   │   export interface PedidoUpdateDTO {
+│   │   │     id: number;
+│   │   │     estado: string;
+│   │   │     direccionEntrega: string;
+│   │   │     lineasPedido: LineaPedidoCreateDTO[];
+│   │   │   }
+│   │   │
+│   │   └── api-response.dto.ts
+│   │       
+│   │       export interface ApiResponseDTO<T> {
+│   │         success: boolean;
+│   │         message: string;
+│   │         data: T;
+│   │       }
+│   │
+│   └── enums/
+│       └── estado-pedido.enum.ts
+│           
+│           export enum EstadoPedido {
+│             PENDIENTE = 'Pendiente',
+│             APROBADO = 'Aprobado',
+│             EN_PROCESO = 'En Proceso',
+│             ENVIADO = 'Enviado',
+│             RECIBIDO = 'Recibido',
+│             CANCELADO = 'Cancelado'
+│           }
+│
+│
+├── application/
+│   └── usecases/
+│       ├── auth/
+│       │   ├── login.usecase.ts
+│       │   │   
+│       │   │   import { Injectable, inject } from '@angular/core';
+│       │   │   import { Router } from '@angular/router';
+│       │   │   import { UsuarioRepository } from '../../../data/repositories/usuario.repository';
+│       │   │   import { UsuarioDTO } from '../../../domain/dtos/usuario.dto';
+│       │   │   
+│       │   │   @Injectable({
+│       │   │     providedIn: 'root'
+│       │   │   })
+│       │   │   export class LoginUseCase {
+│       │   │     private usuarioRepository = inject(UsuarioRepository);
+│       │   │     private router = inject(Router);
+│       │   │     
+│       │   │     async execute(email: string, password: string): Promise<UsuarioDTO> {
+│       │   │       try {
+│       │   │         const usuario = await this.usuarioRepository.login(email, password);
+│       │   │         await this.router.navigate(['/home/dashboard']);
+│       │   │         return usuario;
+│       │   │       } catch (error: any) {
+│       │   │         throw new Error(`Error en login: ${error.message}`);
+│       │   │       }
+│       │   │     }
+│       │   │   }
+│       │   │
+│       │   └── logout.usecase.ts
+│       │       
+│       │       import { Injectable, inject } from '@angular/core';
+│       │       import { Router } from '@angular/router';
+│       │       import { UsuarioRepository } from '../../../data/repositories/usuario.repository';
+│       │       
+│       │       @Injectable({
+│       │         providedIn: 'root'
+│       │       })
+│       │       export class LogoutUseCase {
+│       │         private usuarioRepository = inject(UsuarioRepository);
+│       │         private router = inject(Router);
+│       │         
+│       │         async execute(): Promise<void> {
+│       │           await this.usuarioRepository.logout();
+│       │           await this.router.navigate(['/login']);
+│       │         }
+│       │       }
+│       │
+│       ├── proveedores/
+│       │   ├── get-proveedores.usecase.ts
+│       │   │   
+│       │   │   import { Injectable, inject } from '@angular/core';
+│       │   │   import { ProveedorRepository } from '../../../data/repositories/proveedor.repository';
+│       │   │   import { ProveedorDTO } from '../../../domain/dtos/proveedor.dto';
+│       │   │   
+│       │   │   @Injectable({
+│       │   │     providedIn: 'root'
+│       │   │   })
+│       │   │   export class GetProveedoresUseCase {
+│       │   │     private proveedorRepository = inject(ProveedorRepository);
+│       │   │     
+│       │   │     async execute(): Promise<ProveedorDTO[]> {
+│       │   │       return await this.proveedorRepository.getListadoProveedores();
+│       │   │     }
+│       │   │   }
+│       │   │
+│       │   ├── get-proveedor-by-id.usecase.ts
+│       │   │   
+│       │   │   import { Injectable, inject } from '@angular/core';
+│       │   │   import { ProveedorRepository } from '../../../data/repositories/proveedor.repository';
+│       │   │   import { ProveedorDTO } from '../../../domain/dtos/proveedor.dto';
+│       │   │   
+│       │   │   @Injectable({
+│       │   │     providedIn: 'root'
+│       │   │   })
+│       │   │   export class GetProveedorByIdUseCase {
+│       │   │     private proveedorRepository = inject(ProveedorRepository);
+│       │   │     
+│       │   │     async execute(id: number): Promise<ProveedorDTO> {
+│       │   │       return await this.proveedorRepository.getProveedorPorId(id);
+│       │   │     }
+│       │   │   }
+│       │   │
+│       │   └── get-productos-por-proveedor.usecase.ts
+│       │       
+│       │       import { Injectable, inject } from '@angular/core';
+│       │       import { ProveedorRepository } from '../../../data/repositories/proveedor.repository';
+│       │       import { ProductoProveedorDTO } from '../../../domain/dtos/producto-proveedor.dto';
+│       │       
+│       │       @Injectable({
+│       │         providedIn: 'root'
+│       │       })
+│       │       export class GetProductosPorProveedorUseCase {
+│       │         private proveedorRepository = inject(ProveedorRepository);
+│       │         
+│       │         async execute(id: number): Promise<ProductoProveedorDTO[]> {
+│       │           return await this.proveedorRepository.getProductosPorProveedor(id);
+│       │         }
+│       │       }
+│       │
+│       ├── productos/
+│       │   ├── get-productos.usecase.ts
+│       │   │   
+│       │   │   import { Injectable, inject } from '@angular/core';
+│       │   │   import { ProductoRepository } from '../../../data/repositories/producto.repository';
+│       │   │   import { ProductoDTO } from '../../../domain/dtos/producto.dto';
+│       │   │   
+│       │   │   @Injectable({
+│       │   │     providedIn: 'root'
+│       │   │   })
+│       │   │   export class GetProductosUseCase {
+│       │   │     private productoRepository = inject(ProductoRepository);
+│       │   │     
+│       │   │     async execute(): Promise<ProductoDTO[]> {
+│       │   │       return await this.productoRepository.getListadoProductos();
+│       │   │     }
+│       │   │   }
+│       │   │
+│       │   └── get-producto-by-id.usecase.ts
+│       │       
+│       │       import { Injectable, inject } from '@angular/core';
+│       │       import { ProductoRepository } from '../../../data/repositories/producto.repository';
+│       │       import { ProductoDTO } from '../../../domain/dtos/producto.dto';
+│       │       
+│       │       @Injectable({
+│       │         providedIn: 'root'
+│       │       })
+│       │       export class GetProductoByIdUseCase {
+│       │         private productoRepository = inject(ProductoRepository);
+│       │         
+│       │         async execute(id: number): Promise<ProductoDTO> {
+│       │           return await this.productoRepository.getProductoPorId(id);
+│       │         }
+│       │       }
+│       │
+│       └── pedidos/
+│           ├── get-pedidos.usecase.ts
+│           │   
+│           │   import { Injectable, inject } from '@angular/core';
+│           │   import { PedidoRepository } from '../../../data/repositories/pedido.repository';
+│           │   import { PedidoListDTO } from '../../../domain/dtos/pedido-list.dto';
+│           │   
+│           │   @Injectable({
+│           │     providedIn: 'root'
+│           │   })
+│           │   export class GetPedidosUseCase {
+│           │     private pedidoRepository = inject(PedidoRepository);
+│           │     
+│           │     async execute(): Promise<PedidoListDTO[]> {
+│           │       return await this.pedidoRepository.getListadoPedidos();
+│           │     }
+│           │   }
+│           │
+│           ├── get-pedido-by-id.usecase.ts
+│           │   
+│           │   import { Injectable, inject } from '@angular/core';
+│           │   import { PedidoRepository } from '../../../data/repositories/pedido.repository';
+│           │   import { PedidoDetailDTO } from '../../../domain/dtos/pedido-detail.dto';
+│           │   
+│           │   @Injectable({
+│           │     providedIn: 'root'
+│           │   })
+│           │   export class GetPedidoByIdUseCase {
+│           │     private pedidoRepository = inject(PedidoRepository);
+│           │     
+│           │     async execute(id: number): Promise<PedidoDetailDTO> {
+│           │       return await this.pedidoRepository.getPedidoPorId(id);
+│           │     }
+│           │   }
+│           │
+│           ├── get-pedidos-by-proveedor.usecase.ts
+│           │   
+│           │   import { Injectable, inject } from '@angular/core';
+│           │   import { PedidoRepository } from '../../../data/repositories/pedido.repository';
+│           │   import { PedidoListDTO } from '../../../domain/dtos/pedido-list.dto';
+│           │   
+│           │   @Injectable({
+│           │     providedIn: 'root'
+│           │   })
+│           │   export class GetPedidosByProveedorUseCase {
+│           │     private pedidoRepository = inject(PedidoRepository);
+│           │     
+│           │     async execute(idProveedor: number): Promise<PedidoListDTO[]> {
+│           │       return await this.pedidoRepository.getPedidosPorProveedor(idProveedor);
+│           │     }
+│           │   }
+│           │
+│           ├── get-pedidos-by-estado.usecase.ts
+│           │   
+│           │   import { Injectable, inject } from '@angular/core';
+│           │   import { PedidoRepository } from '../../../data/repositories/pedido.repository';
+│           │   import { PedidoListDTO } from '../../../domain/dtos/pedido-list.dto';
+│           │   
+│           │   @Injectable({
+│           │     providedIn: 'root'
+│           │   })
+│           │   export class GetPedidosByEstadoUseCase {
+│           │     private pedidoRepository = inject(PedidoRepository);
+│           │     
+│           │     async execute(estado: string): Promise<PedidoListDTO[]> {
+│           │       return await this.pedidoRepository.getPedidosPorEstado(estado);
+│           │     }
+│           │   }
+│           │
+│           ├── create-pedido.usecase.ts
+│           │   
+│           │   import { Injectable, inject } from '@angular/core';
+│           │   import { PedidoRepository } from '../../../data/repositories/pedido.repository';
+│           │   import { PedidoCreateDTO } from '../../../domain/dtos/pedido-create.dto';
+│           │   import { PedidoDetailDTO } from '../../../domain/dtos/pedido-detail.dto';
+│           │   
+│           │   @Injectable({
+│           │     providedIn: 'root'
+│           │   })
+│           │   export class CreatePedidoUseCase {
+│           │     private pedidoRepository = inject(PedidoRepository);
+│           │     
+│           │     async execute(pedidoCreateDto: PedidoCreateDTO): Promise<PedidoDetailDTO> {
+│           │       this.validarPedido(pedidoCreateDto);
+│           │       return await this.pedidoRepository.insertarPedido(pedidoCreateDto);
+│           │     }
+│           │     
+│           │     private validarPedido(pedido: PedidoCreateDTO): void {
+│           │       if (!pedido.idProveedor) {
+│           │         throw new Error('Debe seleccionar un proveedor');
+│           │       }
+│           │       
+│           │       if (!pedido.direccionEntrega || pedido.direccionEntrega.trim().length < 10) {
+│           │         throw new Error('La dirección de entrega debe tener al menos 10 caracteres');
+│           │       }
+│           │       
+│           │       if (!pedido.lineasPedido || pedido.lineasPedido.length === 0) {
+│           │         throw new Error('Debe agregar al menos una línea de pedido');
+│           │       }
+│           │       
+│           │       for (const linea of pedido.lineasPedido) {
+│           │         if (!linea.idProducto) {
+│           │           throw new Error('Todas las líneas deben tener un producto seleccionado');
+│           │         }
+│           │         if (linea.cantidad <= 0) {
+│           │           throw new Error('La cantidad debe ser mayor a 0');
+│           │         }
+│           │         if (linea.precioUnitario <= 0) {
+│           │           throw new Error('El precio unitario debe ser mayor a 0');
+│           │         }
+│           │       }
+│           │     }
+│           │   }
+│           │
+│           ├── update-pedido.usecase.ts
+│           │   
+│           │   import { Injectable, inject } from '@angular/core';
+│           │   import { PedidoRepository } from '../../../data/repositories/pedido.repository';
+│           │   import { PedidoUpdateDTO } from '../../../domain/dtos/pedido-update.dto';
+│           │   import { PedidoDetailDTO } from '../../../domain/dtos/pedido-detail.dto';
+│           │   
+│           │   @Injectable({
+│           │     providedIn: 'root'
+│           │   })
+│           │   export class UpdatePedidoUseCase {
+│           │     private pedidoRepository = inject(PedidoRepository);
+│           │     
+│           │     async execute(pedidoUpdateDto: PedidoUpdateDTO): Promise<PedidoDetailDTO> {
+│           │       if (!pedidoUpdateDto.id) {
+│           │         throw new Error('ID de pedido requerido para actualización');
+│           │       }
+│           │       
+│           │       return await this.pedidoRepository.editarPedido(pedidoUpdateDto);
+│           │     }
+│           │   }
+│           │
+│           └── delete-pedido.usecase.ts
+│               
+│               import { Injectable, inject } from '@angular/core';
+│               import { PedidoRepository } from '../../../data/repositories/pedido.repository';
+│               
+│               @Injectable({
+│                 providedIn: 'root'
+│               })
+│               export class DeletePedidoUseCase {
+│                 private pedidoRepository = inject(PedidoRepository);
+│                 
+│                 async execute(id: number): Promise<boolean> {
+│                   if (!id || id <= 0) {
+│                     throw new Error('ID de pedido inválido');
+│                   }
+│                   
+│                   return await this.pedidoRepository.eliminarPedido(id);
+│                 }
+│               }
+│
+│
+└── presentation/
+    ├── models/
+    │   ├── usuario-ui.model.ts
+    │   │   
+    │   │   import { UsuarioDTO } from '../../domain/dtos/usuario.dto';
+    │   │   
+    │   │   export interface UsuarioUIModel extends UsuarioDTO {
+    │   │     nombreCompleto: string;
+    │   │     rolBadgeClass: string;
+    │   │   }
+    │   │
+    │   ├── proveedor-ui.model.ts
+    │   │   
+    │   │   import { ProveedorDTO } from '../../domain/dtos/proveedor.dto';
+    │   │   
+    │   │   export interface ProveedorUIModel extends ProveedorDTO {
+    │   │     estadoBadgeClass: string;
+    │   │     estadoTexto: string;
+    │   │     direccionCompleta?: string;
+    │   │   }
+    │   │
+    │   ├── producto-ui.model.ts
+    │   │   
+    │   │   import { ProductoDTO } from '../../domain/dtos/producto.dto';
+    │   │   
+    │   │   export interface ProductoUIModel extends ProductoDTO {
+    │   │     stockBadgeClass: string;
+    │   │     stockTexto: string;
+    │   │     precioFormateado: string;
+    │   │   }
+    │   │
+    │   ├── pedido-ui.model.ts
+    │   │   
+    │   │   import { PedidoListDTO } from '../../domain/dtos/pedido-list.dto';
+    │   │   
+    │   │   export interface PedidoUIModel extends PedidoListDTO {
+    │   │     estadoBadgeClass: string;
+    │   │     fechaFormateada: string;
+    │   │     totalFormateado: string;
+    │   │   }
+    │   │
+    │   └── linea-pedido-ui.model.ts
+    │       
+    │       import { LineaPedidoDTO } from '../../domain/dtos/linea-pedido.dto';
+    │       
+    │       export interface LineaPedidoUIModel extends LineaPedidoDTO {
+    │         subtotalFormateado: string;
+    │         totalLineaFormateado: string;
+    │         tieneError: boolean;
+    │         mensajeError?: string;
+    │       }
+    │
+    ├── components/
+    │   ├── shared/
+    │   │   ├── header/
+    │   │   │   ├── header.component.ts
+    │   │   │   ├── header.component.html
+    │   │   │   └── header.component.scss
+    │   │   │
+    │   │   ├── sidebar/
+    │   │   │   ├── sidebar.component.ts
+    │   │   │   ├── sidebar.component.html
+    │   │   │   └── sidebar.component.scss
+    │   │   │
+    │   │   ├── loading-spinner/
+    │   │   │   ├── loading-spinner.component.ts
+    │   │   │   ├── loading-spinner.component.html
+    │   │   │   └── loading-spinner.component.scss
+    │   │   │
+    │   │   ├── confirm-dialog/
+    │   │   │   ├── confirm-dialog.component.ts
+    │   │   │   ├── confirm-dialog.component.html
+    │   │   │   └── confirm-dialog.component.scss
+    │   │   │
+    │   │   └── en-construccion/
+    │   │       ├── en-construccion.component.ts
+    │   │       ├── en-construccion.component.html
+    │   │       └── en-construccion.component.scss
+    │   │
+    │   └── pedidos/
+    │       ├── pedido-list/
+    │       │   ├── pedido-list.component.ts
+    │       │   ├── pedido-list.component.html
+    │       │   └── pedido-list.component.scss
+    │       │
+    │       ├── pedido-form/
+    │       │   ├── pedido-form.component.ts
+    │       │   ├── pedido-form.component.html
+    │       │   └── pedido-form.component.scss
+    │       │
+    │       └── linea-pedido-item/
+    │           ├── linea-pedido-item.component.ts
+    │           ├── linea-pedido-item.component.html
+    │           └── linea-pedido-item.component.scss
+    │
+    ├── viewmodels/
+    │   ├── auth/
+    │   │   └── login.viewmodel.ts
+    │   │       
+    │   │       import { Injectable, inject, signal } from '@angular/core';
+    │   │       import { LoginUseCase } from '../../../application/usecases/auth/login.usecase';
+    │   │       
+    │   │       @Injectable()
+    │   │       export class LoginViewModel {
+    │   │         private loginUseCase = inject(LoginUseCase);
+    │   │         
+    │   │         // Signals para estado reactivo
+    │   │         isLoading = signal(false);
+    │   │         errorMessage = signal('');
+    │   │         
+    │   │         async login(email: string, password: string): Promise<void> {
+    │   │           if (!email || !password) {
+    │   │             this.errorMessage.set('Email y contraseña son requeridos');
+    │   │             return;
+    │   │           }
+    │   │           
+    │   │           this.isLoading.set(true);
+    │   │           this.errorMessage.set('');
+    │   │           
+    │   │           try {
+    │   │             await this.loginUseCase.execute(email, password);
+    │   │           } catch (error: any) {
+    │   │             this.errorMessage.set(error.message || 'Error al iniciar sesión');
+    │   │           } finally {
+    │   │             this.isLoading.set(false);
+    │   │           }
+    │   │         }
+    │   │       }
+    │   │
+    │   └── pedidos/
+    │       ├── listado-pedidos.viewmodel.ts
+    │       │   
+    │       │   import { Injectable, inject, signal } from '@angular/core';
+    │       │   import { Router } from '@angular/router';
+    │       │   import { GetPedidosUseCase } from '../../../application/usecases/pedidos/get-pedidos.usecase';
+    │       │   import { GetPedidosByProveedorUseCase } from '../../../application/usecases/pedidos/get-pedidos-by-proveedor.usecase';
+    │       │   import { GetPedidosByEstadoUseCase } from '../../../application/usecases/pedidos/get-pedidos-by-estado.usecase';
+    │       │   import { DeletePedidoUseCase } from '../../../application/usecases/pedidos/delete-pedido.usecase';
+    │       │   import { GetProveedoresUseCase } from '../../../application/usecases/proveedores/get-proveedores.usecase';
+    │       │   import { PedidoUIModel } from '../../models/pedido-ui.model';
+    │       │   import { ProveedorDTO } from '../../../domain/dtos/proveedor.dto';
+    │       │   import { EstadoPedido } from '../../../domain/enums/estado-pedido.enum';
+    │       │   
+    │       │   @Injectable()
+    │       │   export class ListadoPedidosViewModel {
+    │       │     private getPedidosUseCase = inject(GetPedidosUseCase);
+    │       │     private getPedidosByProveedorUseCase = inject(GetPedidosByProveedorUseCase);
+    │       │     private getPedidosByEstadoUseCase = inject(GetPedidosByEstadoUseCase);
+    │       │     private deletePedidoUseCase = inject(DeletePedidoUseCase);
+    │       │     private getProveedoresUseCase = inject(GetProveedoresUseCase);
+    │       │     private router = inject(Router);
+    │       │     
+    │       │     // Signals
+    │       │     pedidos = signal<PedidoUIModel[]>([]);
+    │       │     proveedores = signal<ProveedorDTO[]>([]);
+    │       │     isLoading = signal(false);
+    │       │     errorMessage = signal('');
+    │       │     
+    │       │     // Filtros
+    │       │     filtroEstado = signal<string>('');
+    │       │     filtroProveedor = signal<number | null>(null);
+    │       │     
+    │       │     async init(): Promise<void> {
+    │       │       await Promise.all([
+    │       │         this.cargarPedidos(),
+    │       │         this.cargarProveedores()
+    │       │       ]);
+    │       │     }
+    │       │     
+    │       │     async cargarPedidos(): Promise<void> {
+    │       │       this.isLoading.set(true);
+    │       │       this.errorMessage.set('');
+    │       │       
+    │       │       try {
+    │       │         const pedidosDTO = await this.getPedidosUseCase.execute();
+    │       │         const pedidosUI = pedidosDTO.map(p => this.toUIModel(p));
+    │       │         this.pedidos.set(pedidosUI);
+    │       │       } catch (error: any) {
+    │       │         this.errorMessage.set(error.message);
+    │       │       } finally {
+    │       │         this.isLoading.set(false);
+    │       │       }
+    │       │     }
+    │       │     
+    │       │     async cargarProveedores(): Promise<void> {
+    │       │       try {
+    │       │         const proveedores = await this.getProveedoresUseCase.execute();
+    │       │         this.proveedores.set(proveedores);
+    │       │       } catch (error) {
+    │       │         console.error('Error al cargar proveedores', error);
+    │       │       }
+    │       │     }
+    │       │     
+    │       │     async filtrarPorEstado(estado: string): Promise<void> {
+    │       │       this.filtroEstado.set(estado);
+    │       │       this.isLoading.set(true);
+    │       │       
+    │       │       try {
+    │       │         const pedidosDTO = await this.getPedidosByEstadoUseCase.execute(estado);
+    │       │         const pedidosUI = pedidosDTO.map(p => this.toUIModel(p));
+    │       │         this.pedidos.set(pedidosUI);
+    │       │       } catch (error: any) {
+    │       │         this.errorMessage.set(error.message);
+    │       │       } finally {
+    │       │         this.isLoading.set(false);
+    │       │       }
+    │       │     }
+    │       │     
+    │       │     async filtrarPorProveedor(idProveedor: number): Promise<void> {
+    │       │       this.filtroProveedor.set(idProveedor);
+    │       │       this.isLoading.set(true);
+    │       │       
+    │       │       try {
+    │       │         const pedidosDTO = await this.getPedidosByProveedorUseCase.execute(idProveedor);
+    │       │         const pedidosUI = pedidosDTO.map(p => this.toUIModel(p));
+    │       │         this.pedidos.set(pedidosUI);
+    │       │       } catch (error: any) {
+    │       │         this.errorMessage.set(error.message);
+    │       │       } finally {
+    │       │         this.isLoading.set(false);
+    │       │       }
+    │       │     }
+    │       │     
+    │       │     async limpiarFiltros(): Promise<void> {
+    │       │       this.filtroEstado.set('');
+    │       │       this.filtroProveedor.set(null);
+    │       │       await this.cargarPedidos();
+    │       │     }
+    │       │     
+    │       │     async eliminarPedido(id: number): Promise<void> {
+    │       │       if (!confirm('¿Está seguro de eliminar este pedido?')) {
+    │       │         return;
+    │       │       }
+    │       │       
+    │       │       try {
+    │       │         await this.deletePedidoUseCase.execute(id);
+    │       │         await this.cargarPedidos();
+    │       │       } catch (error: any) {
+    │       │         this.errorMessage.set(error.message);
+    │       │       }
+    │       │     }
+    │       │     
+    │       │     async verDetalle(id: number): Promise<void> {
+    │       │       await this.router.navigate(['/home/pedidos/detalle', id]);
+    │       │     }
+    │       │     
+    │       │     async editarPedido(id: number): Promise<void> {
+    │       │       await this.router.navigate(['/home/pedidos/editar', id]);
+    │       │     }
+    │       │     
+    │       │     async nuevoPedido(): Promise<void> {
+    │       │       await this.router.navigate(['/home/pedidos/nuevo']);
+    │       │     }
+    │       │     
+    │       │     private toUIModel(pedido: any): PedidoUIModel {
+    │       │       return {
+    │       │         ...pedido,
+    │       │         estadoBadgeClass: this.getEstadoBadgeClass(pedido.estado),
+    │       │         fechaFormateada: new Date(pedido.fechaPedido).toLocaleDateString('es-ES'),
+    │       │         totalFormateado: `${pedido.total.toFixed(2)} €`
+    │       │       };
+    │       │     }
+    │       │     
+    │       │     private getEstadoBadgeClass(estado: string): string {
+    │       │       switch (estado) {
+    │       │         case EstadoPedido.PENDIENTE:
+    │       │           return 'badge-warning';
+    │       │         case EstadoPedido.APROBADO:
+    │       │           return 'badge-info';
+    │       │         case EstadoPedido.EN_PROCESO:
+    │       │           return 'badge-primary';
+    │       │         case EstadoPedido.ENVIADO:
+    │       │           return 'badge-success';
+    │       │         case EstadoPedido.RECIBIDO:
+    │       │           return 'badge-success';
+    │       │         case EstadoPedido.CANCELADO:
+    │       │           return 'badge-danger';
+    │       │         default:
+    │       │           return 'badge-secondary';
+    │       │       }
+    │       │     }
+    │       │   }
+    │       │
+    │       └── editar-insertar-pedido.viewmodel.ts
+    │           
+    │           import { Injectable, inject, signal, computed } from '@angular/core';
+    │           import { Router, ActivatedRoute } from '@angular/router';
+    │           import { CreatePedidoUseCase } from '../../../application/usecases/pedidos/create-pedido.usecase';
+    │           import { UpdatePedidoUseCase } from '../../../application/usecases/pedidos/update-pedido.usecase';
+    │           import { GetPedidoByIdUseCase } from '../../../application/usecases/pedidos/get-pedido-by-id.usecase';
+    │           import { GetProveedoresUseCase } from '../../../application/usecases/proveedores/get-proveedores.usecase';
+    │           import { GetProductosPorProveedorUseCase } from '../../../application/usecases/proveedores/get-productos-por-proveedor.usecase';
+    │           import { ProveedorDTO } from '../../../domain/dtos/proveedor.dto';
+    │           import { ProductoProveedorDTO } from '../../../domain/dtos/producto-proveedor.dto';
+    │           import { LineaPedidoCreateDTO } from '../../../domain/dtos/linea-pedido-create.dto';
+    │           import { PedidoCreateDTO } from '../../../domain/dtos/pedido-create.dto';
+    │           import { PedidoUpdateDTO } from '../../../domain/dtos/pedido-update.dto';
+    │           import { UsuarioRepository } from '../../../data/repositories/usuario.repository';
+    │           import { EstadoPedido } from '../../../domain/enums/estado-pedido.enum';
+    │           
+    │           @Injectable()
+    │           export class EditarInsertarPedidoViewModel {
+    │             private createPedidoUseCase = inject(CreatePedidoUseCase);
+    │             private updatePedidoUseCase = inject(UpdatePedidoUseCase);
+    │             private getPedidoByIdUseCase = inject(GetPedidoByIdUseCase);
+    │             private getProveedoresUseCase = inject(GetProveedoresUseCase);
+    │             private getProductosPorProveedorUseCase = inject(GetProductosPorProveedorUseCase);
+    │             private usuarioRepository = inject(UsuarioRepository);
+    │             private router = inject(Router);
+    │             private route = inject(ActivatedRoute);
+    │             
+    │             // Signals - Estado
+    │             modoEdicion = signal(false);
+    │             pedidoId = signal<number | null>(null);
+    │             isLoading = signal(false);
+    │             errorMessage = signal('');
+    │             
+    │             // Signals - Datos
+    │             proveedores = signal<ProveedorDTO[]>([]);
+    │             productosDisponibles = signal<ProductoProveedorDTO[]>([]);
+    │             
+    │             // Signals - Formulario
+    │             proveedorSeleccionado = signal<number | null>(null);
+    │             direccionEntrega = signal('');
+    │             estadoSeleccionado = signal(EstadoPedido.PENDIENTE);
+    │             lineasPedido = signal<LineaPedidoCreateDTO[]>([]);
+    │             
+    │             // Computed signals - Totales calculados
+    │             subtotalPedido = computed(() => {
+    │               return this.lineasPedido().reduce((sum, linea) => {
+    │                 const subtotal = linea.cantidad * linea.precioUnitario;
+    │                 return sum + subtotal;
+    │               }, 0);
+    │             });
+    │             
+    │             impuestosPedido = computed(() => {
+    │               return this.lineasPedido().reduce((sum, linea) => {
+    │                 const subtotal = linea.cantidad * linea.precioUnitario;
+    │                 const iva = subtotal * (linea.ivaPorcentaje / 100);
+    │                 return sum + iva;
+    │               }, 0);
+    │             });
+    │             
+    │             totalPedido = computed(() => {
+    │               return this.subtotalPedido() + this.impuestosPedido();
+    │             });
+    │             
+    │             async init(): Promise<void> {
+    │               await this.cargarProveedores();
+    │               
+    │               const pedidoId = this.route.snapshot.paramMap.get('id');
+    │               if (pedidoId) {
+    │                 this.modoEdicion.set(true);
+    │                 this.pedidoId.set(Number(pedidoId));
+    │                 await this.cargarPedido(Number(pedidoId));
+    │               }
+    │             }
+    │             
+    │             async cargarProveedores(): Promise<void> {
+    │               try {
+    │                 const proveedores = await this.getProveedoresUseCase.execute();
+    │                 this.proveedores.set(proveedores);
+    │               } catch (error) {
+    │                 console.error('Error al cargar proveedores', error);
+    │               }
+    │             }
+    │             
+    │             async onProveedorChange(idProveedor: number): Promise<void> {
+    │               this.proveedorSeleccionado.set(idProveedor);
+    │               this.lineasPedido.set([]);
+    │               
+    │               try {
+    │                 const productos = await this.getProductosPorProveedorUseCase.execute(idProveedor);
+    │                 this.productosDisponibles.set(productos);
+    │               } catch (error) {
+    │                 console.error('Error al cargar productos del proveedor', error);
+    │               }
+    │             }
+    │             
+    │             agregarLinea(): void {
+    │               const nuevaLinea: LineaPedidoCreateDTO = {
+    │                 idProducto: 0,
+    │                 cantidad: 1,
+    │                 precioUnitario: 0,
+    │                 ivaPorcentaje: 21
+    │               };
+    │               
+    │               this.lineasPedido.update(lineas => [...lineas, nuevaLinea]);
+    │             }
+    │             
+    │             eliminarLinea(index: number): void {
+    │               this.lineasPedido.update(lineas => 
+    │                 lineas.filter((_, i) => i !== index)
+    │               );
+    │             }
+    │             
+    │             onLineaChange(index: number, linea: LineaPedidoCreateDTO): void {
+    │               this.lineasPedido.update(lineas => {
+    │                 const nuevasLineas = [...lineas];
+    │                 nuevasLineas[index] = linea;
+    │                 
+    │                 // Autocompletar precio si se seleccionó un producto
+    │                 if (linea.idProducto && linea.precioUnitario === 0) {
+    │                   const producto = this.productosDisponibles().find(
+    │                     p => p.idProducto === linea.idProducto
+    │                   );
+    │                   if (producto) {
+    │                     nuevasLineas[index].precioUnitario = producto.precioUnitario;
+    │                   }
+    │                 }
+    │                 
+    │                 return nuevasLineas;
+    │               });
+    │             }
+    │             
+    │             async guardarPedido(): Promise<void> {
+    │               this.isLoading.set(true);
+    │               this.errorMessage.set('');
+    │               
+    │               try {
+    │                 if (this.modoEdicion()) {
+    │                   await this.actualizarPedido();
+    │                 } else {
+    │                   await this.crearPedido();
+    │                 }
+    │                 
+    │                 await this.router.navigate(['/home/pedidos/listado']);
+    │               } catch (error: any) {
+    │                 this.errorMessage.set(error.message);
+    │               } finally {
+    │                 this.isLoading.set(false);
+    │               }
+    │             }
+    │             
+    │             async cancelar(): Promise<void> {
+    │               await this.router.navigate(['/home/pedidos/listado']);
+    │             }
+    │             
+    │             private async crearPedido(): Promise<void> {
+    │               const usuario = this.usuarioRepository.getCurrentUser();
+    │               if (!usuario) {
+    │                 throw new Error('No hay usuario autenticado');
+    │               }
+    │               
+    │               const pedidoCreateDto: PedidoCreateDTO = {
+    │                 idProveedor: this.proveedorSeleccionado()!,
+    │                 idUsuario: usuario.id,
+    │                 direccionEntrega: this.direccionEntrega(),
+    │                 lineasPedido: this.lineasPedido()
+    │               };
+    │               
+    │               await this.createPedidoUseCase.execute(pedidoCreateDto);
+    │             }
+    │             
+    │             private async actualizarPedido(): Promise<void> {
+    │               const pedidoUpdateDto: PedidoUpdateDTO = {
+    │                 id: this.pedidoId()!,
+    │                 estado: this.estadoSeleccionado(),
+    │                 direccionEntrega: this.direccionEntrega(),
+    │                 lineasPedido: this.lineasPedido()
+    │               };
+    │               
+    │               await this.updatePedidoUseCase.execute(pedidoUpdateDto);
+    │             }
+    │             
+    │             private async cargarPedido(id: number): Promise<void> {
+    │               this.isLoading.set(true);
+    │               
+    │               try {
+    │                 const pedido = await this.getPedidoByIdUseCase.execute(id);
+    │                 
+    │                 this.proveedorSeleccionado.set(pedido.idProveedor);
+    │                 this.direccionEntrega.set(pedido.direccionEntrega);
+    │                 this.estadoSeleccionado.set(pedido.estado as EstadoPedido);
+    │                 
+    │                 // Cargar productos del proveedor
+    │                 await this.onProveedorChange(pedido.idProveedor);
+    │                 
+    │                 // Mapear líneas del pedido
+    │                 const lineas: LineaPedidoCreateDTO[] = pedido.lineasPedido.map(l => ({
+    │                   idProducto: l.idProducto,
+    │                   cantidad: l.cantidad,
+    │                   precioUnitario: l.precioUnitario,
+    │                   ivaPorcentaje: l.ivaPorcentaje
+    │                 }));
+    │                 
+    │                 this.lineasPedido.set(lineas);
+    │               } catch (error: any) {
+    │                 this.errorMessage.set(error.message);
+    │               } finally {
+    │                 this.isLoading.set(false);
+    │               }
+    │             }
+    │           }
+    │
+    └── views/
+        ├── auth/
+        │   └── login/
+        │       ├── login.component.ts
+        │       │   
+        │       │   import { Component, inject } from '@angular/core';
+        │       │   import { CommonModule } from '@angular/common';
+        │       │   import { FormsModule } from '@angular/forms';
+        │       │   import { LoginViewModel } from '../../../viewmodels/auth/login.viewmodel';
+        │       │   
+        │       │   @Component({
+        │       │     selector: 'app-login',
+        │       │     standalone: true,
+        │       │     imports: [CommonModule, FormsModule],
+        │       │     templateUrl: './login.component.html',
+        │       │     styleUrls: ['./login.component.scss'],
+        │       │     providers: [LoginViewModel]
+        │       │   })
+        │       │   export class LoginComponent {
+        │       │     vm = inject(LoginViewModel);
+        │       │     
+        │       │     email = '';
+        │       │     password = '';
+        │       │     
+        │       │     async onSubmit() {
+        │       │       await this.vm.login(this.email, this.password);
+        │       │     }
+        │       │   }
+        │       │
+        │       ├── login.component.html
+        │       └── login.component.scss
+        │
+        ├── main/
+        │   ├── home/
+        │   │   ├── home.component.ts
+        │   │   ├── home.component.html
+        │   │   └── home.component.scss
+        │   │
+        │   └── dashboard/
+        │       ├── dashboard.component.ts
+        │       ├── dashboard.component.html
+        │       └── dashboard.component.scss
+        │
+        ├── pedidos/
+        │   ├── listado-pedidos/
+        │   │   ├── listado-pedidos.component.ts
+        │   │   │   
+        │   │   │   import { Component, inject, OnInit } from '@angular/core';
+        │   │   │   import { CommonModule } from '@angular/common';
+        │   │   │   import { ListadoPedidosViewModel } from '../../../viewmodels/pedidos/listado-pedidos.viewmodel';
+        │   │   │   import { PedidoListComponent } from '../../../components/pedidos/pedido-list/pedido-list.component';
+        │   │   │   
+        │   │   │   @Component({
+        │   │   │     selector: 'app-listado-pedidos',
+        │   │   │     standalone: true,
+        │   │   │     imports: [CommonModule, PedidoListComponent],
+        │   │   │     templateUrl: './listado-pedidos.component.html',
+        │   │   │     styleUrls: ['./listado-pedidos.component.scss'],
+        │   │   │     providers: [ListadoPedidosViewModel]
+        │   │   │   })
+        │   │   │   export class ListadoPedidosComponent implements OnInit {
+        │   │   │     vm = inject(ListadoPedidosViewModel);
+        │   │   │     
+        │   │   │     async ngOnInit() {
+        │   │   │       await this.vm.init();
+        │   │   │     }
+        │   │   │   }
+        │   │   │
+        │   │   ├── listado-pedidos.component.html
+        │   │   └── listado-pedidos.component.scss
+        │   │
+        │   └── editar-insertar-pedido/
+        │       ├── editar-insertar-pedido.component.ts
+        │       │   
+        │       │   import { Component, inject, OnInit } from '@angular/core';
+        │       │   import { CommonModule } from '@angular/common';
+        │       │   import { EditarInsertarPedidoViewModel } from '../../../viewmodels/pedidos/editar-insertar-pedido.viewmodel';
+        │       │   import { PedidoFormComponent } from '../../../components/pedidos/pedido-form/pedido-form.component';
+        │       │   
+        │       │   @Component({
+        │       │     selector: 'app-editar-insertar-pedido',
+        │       │     standalone: true,
+        │       │     imports: [CommonModule, PedidoFormComponent],
+        │       │     templateUrl: './editar-insertar-pedido.component.html',
+        │       │     styleUrls: ['./editar-insertar-pedido.component.scss'],
+        │       │     providers: [EditarInsertarPedidoViewModel]
+        │       │   })
+        │       │   export class EditarInsertarPedidoComponent implements OnInit {
+        │       │     vm = inject(EditarInsertarPedidoViewModel);
+        │       │     
+        │       │     async ngOnInit() {
+        │       │       await this.vm.init();
+        │       │     }
+        │       │   }
+        │       │
+        │       ├── editar-insertar-pedido.component.html
+        │       └── editar-insertar-pedido.component.scss
+        │
+        └── shared/
+            └── en-construccion/
+                ├── en-construccion.component.ts
+                ├── en-construccion.component.html
+                └── en-construccion.component.scss
+
+
+================================================================================
+                        APP.CONFIG.TS (ANGULAR 18+)
+================================================================================
+
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { provideAuth, getAuth } from '@angular/fire/auth';
+
+import { routes } from './app.routes';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { errorInterceptor } from './core/interceptors/error.interceptor';
+import { environment } from '../environments/environment';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
+    provideHttpClient(
+      withInterceptors([authInterceptor, errorInterceptor])
+    ),
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideAuth(() => getAuth())
+  ]
+};
+
+
+================================================================================
+                        APP.ROUTES.TS (RUTAS)
+================================================================================
+
+import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
+
+export const routes: Routes = [
+  {
+    path: 'login',
+    loadComponent: () => import('./presentation/views/auth/login/login.component')
+      .then(m => m.LoginComponent)
+  },
+  {
+    path: 'home',
+    canActivate: [authGuard],
+    loadComponent: () => import('./presentation/views/main/home/home.component')
+      .then(m => m.HomeComponent),
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./presentation/views/main/dashboard/dashboard.component')
+          .then(m => m.DashboardComponent)
+      },
+      {
+        path: 'pedidos',
+        children: [
+          {
+            path: 'listado',
+            loadComponent: () => import('./presentation/views/pedidos/listado-pedidos/listado-pedidos.component')
+              .then(m => m.ListadoPedidosComponent)
+          },
+          {
+            path: 'nuevo',
+            loadComponent: () => import('./presentation/views/pedidos/editar-insertar-pedido/editar-insertar-pedido.component')
+              .then(m => m.EditarInsertarPedidoComponent)
+          },
+          {
+            path: 'editar/:id',
+            loadComponent: () => import('./presentation/views/pedidos/editar-insertar-pedido/editar-insertar-pedido.component')
+              .then(m => m.EditarInsertarPedidoComponent)
+          },
+          {
+            path: '',
+            redirectTo: 'listado',
+            pathMatch: 'full'
+          }
+        ]
+      },
+      {
+        path: 'productos',
+        loadComponent: () => import('./presentation/views/shared/en-construccion/en-construccion.component')
+          .then(m => m.EnConstruccionComponent)
+      },
+      {
+        path: 'proveedores',
+        loadComponent: () => import('./presentation/views/shared/en-construccion/en-construccion.component')
+          .then(m => m.EnConstruccionComponent)
+      },
+      {
+        path: 'personal',
+        loadComponent: () => import('./presentation/views/shared/en-construccion/en-construccion.component')
+          .then(m => m.EnConstruccionComponent)
+      },
+      {
+        path: 'inventario',
+        loadComponent: () => import('./presentation/views/shared/en-construccion/en-construccion.component')
+          .then(m => m.EnConstruccionComponent)
+      },
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      }
+    ]
+  },
+  {
+    path: '',
+    redirectTo: '/login',
+    pathMatch: 'full'
+  },
+  {
+    path: '**',
+    redirectTo: '/login'
+  }
+];
+
+
+================================================================================
+                        ENVIRONMENT.TS
+================================================================================
+
+export const environment = {
+  production: false,
+  apiUrl: 'https://tu-api.azurewebsites.net/api',
+  firebase: {
+    apiKey: "TU_API_KEY",
+    authDomain: "tu-proyecto.firebaseapp.com",
+    projectId: "tu-proyecto",
+    storageBucket: "tu-proyecto.appspot.com",
+    messagingSenderId: "123456789",
+    appId: "1:123456789:web:abcdef123456"
+  }
+};
